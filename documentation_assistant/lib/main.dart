@@ -45,7 +45,8 @@ class MyHomePageState extends State<MyHomePage> {
   List<Animal> animalFeedList = [
     Animal("Willa", 0, 0, 0),
     Animal("Valora", 0, 0, 0),
-    Animal("Xayla", 0, 0, 0)
+    Animal("Xayla", 0, 0, 0),
+    Animal("Cho gath", 0, 0, 0)
   ];
 
   String extractDate(String receivedDate) {
