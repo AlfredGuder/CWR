@@ -46,7 +46,7 @@ class MyHomePageState extends State<MyHomePage> {
     Animal("Willa", 0, 0, 0),
     Animal("Valora", 0, 0, 0),
     Animal("Xayla", 0, 0, 0),
-    Animal("Cho gath", 0, 0, 0)
+    Animal("Cho gath", 0, 0, 5)
   ];
 
   String extractDate(String receivedDate) {
