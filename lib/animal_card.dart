@@ -1,11 +1,9 @@
+import 'package:documentation_assistant/animal.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:collection';
-import './main.dart';
 
 class AnimalCard extends StatefulWidget {
   final List<Animal> animalFeedList;
-  AnimalCard(this.animalFeedList, {super.key});
+  const AnimalCard(this.animalFeedList, {super.key});
 
   @override
   State<AnimalCard> createState() => _MyWidgetState();
@@ -31,9 +29,8 @@ class _MyWidgetState extends State<AnimalCard> {
 
     super.dispose();
   }
-  //Animal willaClass = Animal("willa", 0, 0, 0);
-  // Animal valoraClass = Animal("valora", 0, 0, 0);
 
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 500,
@@ -91,26 +88,26 @@ class _MyWidgetState extends State<AnimalCard> {
   */
   }
 
-  Future<int?> _dialogBuilder() => showDialog<int>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Enter amount:"),
-          content: TextField(
-            autofocus: true,
-            controller: controller,
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-          ),
-          actions: [
-            FloatingActionButton(
-              onPressed: submit,
-              child: const Text("Submit"),
-            )
-          ],
-        ),
-      );
+  // Future<int?> _dialogBuilder() => showDialog<int>(
+  //       context: context,
+  //       builder: (context) => AlertDialog(
+  //         title: const Text("Enter amount:"),
+  //         content: TextField(
+  //           autofocus: true,
+  //           controller: controller,
+  //           keyboardType: TextInputType.number,
+  //           inputFormatters: <TextInputFormatter>[
+  //             FilteringTextInputFormatter.digitsOnly
+  //           ],
+  //         ),
+  //         actions: [
+  //           FloatingActionButton(
+  //             onPressed: submit,
+  //             child: const Text("Submit"),
+  //           )
+  //         ],
+  //       ),
+  //     );
 
   void submit() {
     Navigator.of(context).pop(

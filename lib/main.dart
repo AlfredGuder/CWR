@@ -1,37 +1,37 @@
-//import 'dart:ffi';
 
 import 'dart:developer';
-
+import 'package:documentation_assistant/animal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import './animalCard.dart';
-import './feedUpdate.dart';
+import 'package:documentation_assistant/animal_card.dart';
+
 
 void main() async {
   await Hive.initFlutter();
   await Hive.openBox("animalFeedBox");
+  print("Yeet");
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: "Documentation Assistant",
       home: MyHomePage(),
     );
   }
 }
 
-//final List<String> animals = ["Willa", "Valora", "Thane", "T'Challa"];
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   State<MyHomePage> createState() => MyHomePageState();
 }
@@ -65,16 +65,16 @@ class MyHomePageState extends State<MyHomePage> {
     //print(_myBox.get(checkDate));
     // for (int i = 0; i < animalFeedList.length; i++) {
     print(targetAnimal.toString());
-    var AnimalUpdateMap = targetAnimal;
+    var animalUpdateMap = targetAnimal;
     print(
-      AnimalUpdateMap.toString(),
+      animalUpdateMap.toString(),
     );
 
     // List AnimalUpdateList = AnimalUpdateMap.values.toList();
-    print(AnimalUpdateMap["Am"].runtimeType);
-    animalFeedList[0].amFeed = AnimalUpdateMap["Am"];
-    animalFeedList[0].midFeed = AnimalUpdateMap["Mid"];
-    animalFeedList[0].pmFeed = AnimalUpdateMap["Pm"];
+    print(animalUpdateMap["Am"].runtimeType);
+    animalFeedList[0].amFeed = animalUpdateMap["Am"];
+    animalFeedList[0].midFeed = animalUpdateMap["Mid"];
+    animalFeedList[0].pmFeed = animalUpdateMap["Pm"];
     print(animalFeedList[0].midFeed);
     //print(AnimalUpdateMap);
     // }
@@ -147,7 +147,7 @@ class MyHomePageState extends State<MyHomePage> {
                     (() => date = newDate),
                   );
                 },
-                child: Text("C"),
+                child: const Text("C"),
               ),
             ],
           ),
@@ -163,11 +163,11 @@ class MyHomePageState extends State<MyHomePage> {
                 });
               }
             },
-            child: Text("Add"),
+            child: const Text("Add"),
           ),
           FloatingActionButton(
             onPressed: saveData,
-            child: Text("Save"),
+            child: const Text("Save"),
           )
         ],
       ),
@@ -206,7 +206,9 @@ class MyHomePageState extends State<MyHomePage> {
                           } else if (data[1] == "PM") {
                             animal.pmFeed = int.parse(data[0]);
                           }
-                          Navigator.of(context).pop(animal);
+                          if(mounted) {
+                            Navigator.of(context).pop(animal);
+                          }
                         },
                         child: Text(animalFeedList[index].animalName),
                       )
@@ -234,9 +236,11 @@ class MyHomePageState extends State<MyHomePage> {
                 .map((time) => ElevatedButton(
                     onPressed: () async {
                       String amount = await feedAmountPicker() ?? "";
-                      Navigator.of(context).pop(
-                        "$amount,$time",
-                      );
+                      if(mounted) {
+                        Navigator.of(context).pop(
+                          "$amount,$time",
+                        );
+                      }
                     },
                     child: Text(time)))
                 .toList()
@@ -426,19 +430,6 @@ class MyHomePageState extends State<MyHomePage> {
 
 }
 
-class Animal {
-  var animalName;
-  int amFeed = 0;
-  int midFeed = 0;
-  int pmFeed = 0;
-
-  Animal(String animalName, int amFeed, int midFeed, int pmFeed) {
-    this.animalName = animalName;
-    this.amFeed = amFeed;
-    this.midFeed = midFeed;
-    this.pmFeed = pmFeed;
-  }
-}
 
 
 
