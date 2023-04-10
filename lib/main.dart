@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 import 'package:documentation_assistant/animal.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:convert';
 import 'package:documentation_assistant/animal_card.dart';
-
 
 void main() async {
   await Hive.initFlutter();
@@ -27,7 +25,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -58,26 +55,27 @@ class MyHomePageState extends State<MyHomePage> {
     String useDate = extractDate(checkDate);
     log(_myBox.toMap().toString(), name: "myBoxValues");
 
-    //String editorStringCheck = _myBox.get(checkDate);
-    var targetAnimal =
-        _myBox.get(useDate, defaultValue: {"Am": 0, "Mid": 0, "Pm": 0});
+    if (_myBox.get(useDate) == null) {
+      for (int i = 0; i < animalFeedList.length; i++) {
+        animalFeedList[i].amFeed = 0;
+        animalFeedList[i].midFeed = 0;
+        animalFeedList[i].pmFeed = 0;
+      }
+    } else {
+      var targetAnimal = _myBox.get(
+        useDate,
+      );
 
-    //print(_myBox.get(checkDate));
-    // for (int i = 0; i < animalFeedList.length; i++) {
-    print(targetAnimal.toString());
-    var animalUpdateMap = targetAnimal;
-    print(
-      animalUpdateMap.toString(),
-    );
+      var targetAnimalMap = jsonDecode(targetAnimal);
+      //var willaFeeds = targetAnimalMap[animalFeedList[0].animalName];
 
-    // List AnimalUpdateList = AnimalUpdateMap.values.toList();
-    print(animalUpdateMap["Am"].runtimeType);
-    animalFeedList[0].amFeed = animalUpdateMap["Am"];
-    animalFeedList[0].midFeed = animalUpdateMap["Mid"];
-    animalFeedList[0].pmFeed = animalUpdateMap["Pm"];
-    print(animalFeedList[0].midFeed);
-    //print(AnimalUpdateMap);
-    // }
+      for (int i = 0; i < animalFeedList.length; i++) {
+        var animalMap = targetAnimalMap[animalFeedList[i].animalName];
+        animalFeedList[i].amFeed = animalMap["Am"];
+        animalFeedList[i].midFeed = animalMap["Mid"];
+        animalFeedList[i].pmFeed = animalMap["Pm"];
+      }
+    }
   }
 
   /*
@@ -206,7 +204,7 @@ class MyHomePageState extends State<MyHomePage> {
                           } else if (data[1] == "PM") {
                             animal.pmFeed = int.parse(data[0]);
                           }
-                          if(mounted) {
+                          if (mounted) {
                             Navigator.of(context).pop(animal);
                           }
                         },
@@ -236,7 +234,7 @@ class MyHomePageState extends State<MyHomePage> {
                 .map((time) => ElevatedButton(
                     onPressed: () async {
                       String amount = await feedAmountPicker() ?? "";
-                      if(mounted) {
+                      if (mounted) {
                         Navigator.of(context).pop(
                           "$amount,$time",
                         );
