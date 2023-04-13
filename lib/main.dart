@@ -56,42 +56,37 @@ class MyHomePageState extends State<MyHomePage> {
     log(_myBox.toMap().toString(), name: "myBoxValues");
 
     if (_myBox.get(useDate) == null) {
-      for (int i = 0; i < animalFeedList.length; i++) {
-        animalFeedList[i].amFeed = 0;
-        animalFeedList[i].midFeed = 0;
-        animalFeedList[i].pmFeed = 0;
+      for (Animal animal in animalFeedList) {
+        animal.amFeed = 0;
+        animal.midFeed = 0;
+        animal.pmFeed = 0;
       }
+
+      //     for (Animal animal in animalFeedList) {
+      //   updateMap[animal.animalName] = {
+      //     "Am": animal.amFeed,
+      //     "Mid": animal.midFeed,
+      //     "Pm": animal.pmFeed,
+      //   };
+      // }
     } else {
-      var targetAnimal = _myBox.get(
+      String targetAnimal = _myBox.get(
         useDate,
       );
 
       var targetAnimalMap = jsonDecode(targetAnimal);
       //var willaFeeds = targetAnimalMap[animalFeedList[0].animalName];
 
-      for (int i = 0; i < animalFeedList.length; i++) {
-        var animalMap = targetAnimalMap[animalFeedList[i].animalName];
-        animalFeedList[i].amFeed = animalMap["Am"];
-        animalFeedList[i].midFeed = animalMap["Mid"];
-        animalFeedList[i].pmFeed = animalMap["Pm"];
+      for (Animal animal in animalFeedList) {
+        var animalMap = targetAnimalMap[animal.animalName];
+        animal.amFeed = animalMap["Am"];
+        animal.midFeed = animalMap["Mid"];
+        animal.pmFeed = animalMap["Pm"];
       }
+      print(targetAnimal);
+      print(checkDate);
     }
   }
-
-  /*
-  void saveData() {
-    var updateMap = {
-      "name": animalFeedList[0].animalName,
-      "Am": animalFeedList[0].amFeed,
-      "Mid": animalFeedList[0].midFeed,
-      "Pm": animalFeedList[0].pmFeed,
-    };
-
-    String feedMap = jsonEncode(updateMap);
-    _myBox.put(date.toString(), feedMap);
-    print(_myBox.get(date.toString()));
-  }
-  */
 
   @override
   void initState() {
@@ -112,14 +107,6 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    /*
-    animalFeedList = [
-      Animal("Willa", 0, 0, 0),
-      Animal("Valora", 0, 0, 0),
-      Animal("Xayla", 0, 0, 0)
-      
-    ];
-*/
     return Scaffold(
       appBar: AppBar(
         title: const Text("Animals"),
@@ -159,6 +146,7 @@ class MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   animalFeedList[animalIndex] = animalToUpdate;
                 });
+                controller.clear();
               }
             },
             child: const Text("Add"),
@@ -189,12 +177,11 @@ class MyHomePageState extends State<MyHomePage> {
                         onPressed: () async {
                           Animal animal = animalFeedList[index];
                           String animalName = animal.animalName;
-                          //print(animalChoice);
 
                           int animalIndex = animalFeedList.indexWhere(
                               (Animal animal) =>
                                   animal.animalName == animalName);
-                          //int animalIndex = animalIndexChooser(animalChoice, 0);
+
                           List<String> data =
                               (await feedTimePicker(animalIndex)).split(",");
                           if (data[1] == "AM") {
@@ -217,15 +204,6 @@ class MyHomePageState extends State<MyHomePage> {
         ),
       );
 
-  // animalIndexChooser(String animalChoice, int i) {
-  //   if (animalChoice == animalFeedList[i].animalName) {
-  //     return i;
-  //   } else {
-  //     i++;
-  //     animalIndexChooser(animalChoice, i);
-  //   }
-  // }
-
   Future feedTimePicker(int animalChoice) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -241,28 +219,7 @@ class MyHomePageState extends State<MyHomePage> {
                       }
                     },
                     child: Text(time)))
-                .toList()
-            // [
-            //   ElevatedButton(
-            //       onPressed: () {
-            //         feedChoice = "AM";
-            //         feedAmountPicker(feedChoice, animalChoice);
-            //       },
-            //       child: const Text("AM")),
-            //   ElevatedButton(
-            //       onPressed: () {
-            //         feedChoice = "MID";
-            //         feedAmountPicker(feedChoice, animalChoice);
-            //       },
-            //       child: const Text("MID")),
-            //   ElevatedButton(
-            //       onPressed: () {
-            //         feedChoice = "PM";
-            //         feedAmountPicker(feedChoice, animalChoice);
-            //       },
-            //       child: const Text("PM")),
-            // ],
-            ),
+                .toList()),
       );
 
   Future<String?> feedAmountPicker() => showDialog<String?>(
@@ -304,35 +261,6 @@ class MyHomePageState extends State<MyHomePage> {
 
     String feedMap = jsonEncode(updateMap);
     _myBox.put(date.toString().split(" ")[0], feedMap);
-    //print(_myBox.get(date.toString()));
-  }
-
-/*
-  Future<int?> _dialogBuilder() => showDialog<int>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Enter amount:"),
-          content: TextField(
-            autofocus: true,
-            controller: controller,
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-          ),
-          actions: [
-            FloatingActionButton(
-              onPressed: submit,
-              child: const Text("Submit"),
-            )
-          ],
-        ),
-      );
-
-  void submit() {
-    Navigator.of(context).pop(
-      int.parse(controller.text),
-    );
   }
 
   feedPicker() => showDialog(
@@ -379,93 +307,4 @@ class MyHomePageState extends State<MyHomePage> {
     feedChoice = "cancel";
     Navigator.of(context).pop();
   }
- */
-/*
-  Future<void> _dialogBuilder(BuildContext context) {
-    return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Choose value to modify"),
-            actions: [
-              FloatingActionButton(
-                onPressed: _dialogSubmitter(context, "AM"),
-                child: const Text("AM"),
-              ),
-              FloatingActionButton(
-                onPressed: _dialogSubmitter(context, "MID"),
-                child: const Text("MID"),
-              ),
-              FloatingActionButton(
-                onPressed: _dialogSubmitter(context, "PM"),
-                child: const Text("PM"),
-              ),
-            ],
-          );
-        });
-  }
-*/
-
-  /*
-  _dialogSubmitter(BuildContext context, String dialogChoice) {
-    return AlertDialog(title: const Text("Enter amount:"), actions: [
-      TextField(
-        onSubmitted: (var amount) {
-          if (dialogChoice == "AM") {
-            willaClass.amFeed = amount;
-          } else if (dialogChoice == "MID") {
-            willaClass.midFeed = amount;
-          } else if (dialogChoice == "PM") {
-            willaClass.pmFeed == amount;
-            Navigator.pop(context);
-          }
-        },
-      )
-    ]);
-  }
-
-  */
-
 }
-
-
-
-
-
-/*
- Card(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  animals[0],
-                ),
-                Text("AM:${willaClass.amFeed.toString()}"),
-                Text("MID:${willaClass.midFeed.toString()}"),
-                Text("PM:${willaClass.pmFeed.toString()}"),
-                FloatingActionButton(
-                  onPressed: () async {
-                    final feedAmount = await _dialogBuilder();
-                    //if (feedAmount == null || feedAmount.isEmpty) return;
-                    await feedPicker();
-                    setState(() {
-                      if (feedChoice == "AM") {
-                        this.willaClass.amFeed = feedAmount as int;
-                      } else if (feedChoice == "MID") {
-                        this.willaClass.midFeed = feedAmount as int;
-                      } else if (feedChoice == "PM") {
-                        this.willaClass.pmFeed = feedAmount as int;
-                      } else if (feedChoice == "cancel") {
-                        return;
-                      }
-                    });
-                    print(willaClass.amFeed);
-                  },
-                  child: const Text("Add"),
-                )
-              ],
-            ),
-          ),
-
-
-          */
