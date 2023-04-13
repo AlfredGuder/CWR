@@ -55,36 +55,25 @@ class MyHomePageState extends State<MyHomePage> {
     String useDate = extractDate(checkDate);
     log(_myBox.toMap().toString(), name: "myBoxValues");
 
-    if (_myBox.get(useDate) == null) {
+    String? targetAnimal = _myBox.get(
+      useDate,
+    );
+
+    // print("Loading animals for: $checkDate\n$targetAnimal");
+    if (targetAnimal == null) {
       for (Animal animal in animalFeedList) {
         animal.amFeed = 0;
         animal.midFeed = 0;
         animal.pmFeed = 0;
       }
-
-      //     for (Animal animal in animalFeedList) {
-      //   updateMap[animal.animalName] = {
-      //     "Am": animal.amFeed,
-      //     "Mid": animal.midFeed,
-      //     "Pm": animal.pmFeed,
-      //   };
-      // }
     } else {
-      String targetAnimal = _myBox.get(
-        useDate,
-      );
-
       var targetAnimalMap = jsonDecode(targetAnimal);
-      //var willaFeeds = targetAnimalMap[animalFeedList[0].animalName];
-
       for (Animal animal in animalFeedList) {
         var animalMap = targetAnimalMap[animal.animalName];
         animal.amFeed = animalMap["Am"];
         animal.midFeed = animalMap["Mid"];
         animal.pmFeed = animalMap["Pm"];
       }
-      print(targetAnimal);
-      print(checkDate);
     }
   }
 
