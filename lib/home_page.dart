@@ -6,7 +6,6 @@ import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import 'package:intl/intl.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -20,45 +19,48 @@ class MyHomePageState extends State<MyHomePage> {
   late TextEditingController controller;
   String feedChoice = "MID";
   String animalChoice = "Willa";
+  DateTime selectedDate = DateTime.now();
+  int firstDay = 0;
 
   List<Animal> animalFeedList = [
-    Animal(animalName: "Willa", amFeed:  0, midFeed:  0, pmFeed:  0),
+    Animal(animalName: "Willa", amFeed: 0, midFeed: 0, pmFeed: 0),
     Animal(animalName: "Valora", amFeed: 0, midFeed: 0, pmFeed: 0),
     Animal(animalName: "Xayla", amFeed: 0, midFeed: 0, pmFeed: 0),
-    Animal(animalName: "Cho gath",  amFeed: 0, midFeed: 0, pmFeed: 5)
+    Animal(animalName: "Cho gath", amFeed: 0, midFeed: 0, pmFeed: 5)
   ];
 
-  String extractDate(DateTime receivedDate) => Resources.hiveDataFormat.format(receivedDate);
+  String extractDate(DateTime receivedDate) {
+    print(
+        "Converting $receivedDate => ${Resources.hiveDataFormat.format(receivedDate)}");
+    return Resources.hiveDataFormat.format(receivedDate);
+  }
 
-  void dateEditingCheck(DateTime checkDate) {
+  void dateEditingCheck(DateTime checkDate, {bool displaySnackBar = true}) {
     String useDate = extractDate(checkDate);
-    print("Checking for feeding schedule for $useDate in \n${_myBox.toMap().toString()}");
 
-     String? targetAnimal = _myBox.get(
-      useDate,
-    );
+    Map<String, Animal> feedData = readAnimalsFromDate(checkDate);
+    if (displaySnackBar) {
+      if (feedData.isEmpty) {
+        showSnackBar("No data saved for $useDate");
+      } else {
+        showSnackBar("Read data for ${feedData.length} animals");
+      }
+    }
+    for (Animal animal in animalFeedList) {
+      String currentAnimalName = animal.animalName;
+      Animal newAnimalData = feedData[currentAnimalName] ??
+          Animal.defaultAnimal(currentAnimalName);
 
-    // print("Loading animals for: $checkDate\n$targetAnimal");
-    if (targetAnimal == null) {
-      for (Animal animal in animalFeedList) {
-        animal.amFeed = 0;
-        animal.midFeed = 0;
-        animal.pmFeed = 0;
-      }
-    } else {
-      var targetAnimalMap = jsonDecode(targetAnimal);
-      for (Animal animal in animalFeedList) {
-        var animalMap = targetAnimalMap[animal.animalName];
-        animal.amFeed = animalMap["Am"];
-        animal.midFeed = animalMap["Mid"];
-        animal.pmFeed = animalMap["Pm"];
-      }
+      animal.amFeed = newAnimalData.amFeed;
+      animal.midFeed = newAnimalData.midFeed;
+      animal.pmFeed = newAnimalData.pmFeed;
     }
   }
 
   @override
   void initState() {
     super.initState();
+    dateEditingCheck(selectedDate, displaySnackBar: false);
 
     controller = TextEditingController();
   }
@@ -66,16 +68,12 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     controller.dispose();
-
+    Hive.close();
     super.dispose();
   }
 
-  DateTime selectedDate = DateTime.now();
-  int firstDay = 0;
-
   @override
   Widget build(BuildContext context) {
- 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Animals"),
@@ -85,7 +83,8 @@ class MyHomePageState extends State<MyHomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
+              Text(
+                  "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
               ElevatedButton(
                 onPressed: () async {
                   DateTime? newDate = await showDatePicker(
@@ -161,7 +160,7 @@ class MyHomePageState extends State<MyHomePage> {
                           } else if (data[1] == "PM") {
                             animal.pmFeed = int.parse(data[0]);
                           }
-                          if(mounted) {
+                          if (mounted) {
                             Navigator.of(context).pop(animal);
                           }
                         },
@@ -182,15 +181,14 @@ class MyHomePageState extends State<MyHomePage> {
                 .map((time) => ElevatedButton(
                     onPressed: () async {
                       String amount = await feedAmountPicker() ?? "";
-                      if(mounted) {
+                      if (mounted) {
                         Navigator.of(context).pop(
                           "$amount,$time",
                         );
                       }
                     },
                     child: Text(time)))
-                .toList()
-            ),
+                .toList()),
       );
 
   Future<String?> feedAmountPicker() => showDialog<String?>(
@@ -220,25 +218,37 @@ class MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void saveData() async {
-    print("Saving data for ${animalFeedList.length} animals\n${animalFeedList.map((e) => e.toString()).join("\n")}");
-    var updateMap = {};
-    for (Animal animal in animalFeedList) {
-      updateMap[animal.animalName] = animal.toJson();
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+    ));
+  }
+
+  Map<String, Animal> readAnimalsFromDate(DateTime tarrgetDate) {
+    String dateKey = extractDate(tarrgetDate);
+    var savedData = _myBox.get(dateKey);
+    if (savedData == null) {
+      return {};
     }
 
-    String feedMap = jsonEncode(updateMap);
-    await _myBox.put(extractDate(selectedDate), feedMap);
-    var savedData = _myBox.get(extractDate(selectedDate));
-    print("Reading saved data (${savedData.runtimeType})\n$savedData");
-
-
     Map<String, dynamic> decodedData = jsonDecode(savedData);
-    print("Decoded data ${decodedData.runtimeType}\n$decodedData");
+    Map<String, Animal> out = {}..addEntries(decodedData.entries
+        .map((e) => MapEntry(e.key, Animal.fromJson(jsonDecode(e.value)))));
 
+    return out;
+  }
 
-    decodedData.updateAll((key, value) => Animal.fromJson(value));
+  void saveData() async {
+    print(
+        "Saving data for ${animalFeedList.length} animals\n${animalFeedList.map((e) => e.toString()).join("\n")}");
+    var updateMap = {};
+    for (Animal animal in animalFeedList) {
+      if (animal.hasDefaultValues()) continue;
+      updateMap[animal.animalName] = animal.toJson();
+    }
+    String feedMap = jsonEncode(updateMap);
 
-    print("Post mapping $decodedData");
+    await _myBox.put(extractDate(selectedDate), feedMap);
+    showSnackBar("Saved data for ${updateMap.length} animals");
   }
 }

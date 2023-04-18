@@ -24,13 +24,19 @@ class Animal {
         midFeed = 0,
         pmFeed = 0;
 
+  bool hasDefaultValues() {
+    return amFeed == 0 && midFeed == 0 && pmFeed == 0;
+  }
+
   String toJson() {
-    String out = {
+    Map<String, dynamic> outMap = {
       "animalName": animalName,
       "amFeed": amFeed,
       "midFeed": midFeed,
       "pmFeed": pmFeed
-    }.toString();
+    };
+
+    String out = jsonEncode(outMap);
 
     print("Converting\n$this\ntoJson\n$out");
     return out;

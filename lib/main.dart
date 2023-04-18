@@ -7,7 +7,6 @@ bool populateDummyData = true;
 void main() async {
   await Hive.initFlutter();
   await Hive.openBox("animalFeedBox");
-  print("Yeet");
 
   runApp(const MyApp());
 }
