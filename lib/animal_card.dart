@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class AnimalCard extends StatefulWidget {
   final List<Animal> animalFeedList;
-  const AnimalCard(this.animalFeedList, {super.key});
+  final DateTime useDate;
+  const AnimalCard(this.animalFeedList, this.useDate, {super.key});
 
   @override
   State<AnimalCard> createState() => _MyWidgetState();
@@ -13,7 +14,7 @@ class _MyWidgetState extends State<AnimalCard> {
   late TextEditingController controller;
   String feedChoice = "MID";
   int animalNumber = 0;
-
+  late DateTime currentDate;
   late List<Animal> animals;
 
   @override
@@ -21,6 +22,7 @@ class _MyWidgetState extends State<AnimalCard> {
     super.initState();
     animals = widget.animalFeedList;
     controller = TextEditingController();
+    currentDate = widget.useDate;
   }
 
   @override
@@ -41,10 +43,11 @@ class _MyWidgetState extends State<AnimalCard> {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(animals[index].animalName),
-                Text("AM:${animals[index].amFeed}"),
-                Text("MID:${animals[index].midFeed}"),
-                Text("PM:${animals[index].pmFeed}"),
+                Text(animals[index].name),
+                Text('${animals[index].amFeed(currentDate.toString())}'),
+                //Text("AM:${animals[index].amFeed}"),
+                Text('${animals[index].midFeed(currentDate.toString())}'),
+                Text('${animals[index].pmFeed(currentDate.toString())}'),
               ],
             );
           }),
