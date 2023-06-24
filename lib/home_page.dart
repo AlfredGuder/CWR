@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:documentation_assistant/feces_page.dart';
-import 'package:documentation_assistant/main.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:documentation_assistant/sheet_builder.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +9,10 @@ import 'package:gsheets/gsheets.dart';
 import 'package:hive/hive.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.sheetCredentials, required this.sheetId})
+  const MyHomePage({Key? key, required this.sheetCredentials, required this.sheetId})
       : super(key: key);
-  String sheetCredentials;
-  String sheetId;
+  final String sheetCredentials;
+  final String sheetId;
   //const MyHomePage({super.key});
   //Feces_Page({Key? key, required this.animalNames}) : super(key: key);
   //List<String> animalNames;
@@ -27,7 +24,6 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   late String _credentials;
   late String _sheetId;
-  final _myBox = Hive.box("animalFeedBox");
   late TextEditingController controller;
   String feedChoice = "MID";
   String animalChoice = "Willa";
@@ -179,7 +175,7 @@ class MyHomePageState extends State<MyHomePage> {
                 onPressed: () {
                   animalnamegenerator();
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return Feces_Page(
+                    return FecesPage(
                       animalNames: animalNames,
                       sheetCredentials: _credentials,
                       sheetId: _sheetId,
@@ -196,7 +192,7 @@ class MyHomePageState extends State<MyHomePage> {
                       selectedDate.year, animalFeedList);
                 },
                 heroTag: 'btn4',
-                child: Text('C'),
+                child: const Text('C'),
               )
             ],
           )
@@ -357,10 +353,10 @@ class MyHomePageState extends State<MyHomePage> {
     final gsheets = GSheets(_credentials);
 
     //fetch spreadsheet by ID
-    final CWRSheets = await gsheets.spreadsheet(_sheetId);
+    final glboalSheet = await gsheets.spreadsheet(_sheetId);
 
     //fetch worksheet by title
-    var feedSheet = CWRSheets.worksheetByTitle('AnimalFeedSheet');
+    var feedSheet = glboalSheet.worksheetByTitle('AnimalFeedSheet');
 
     await feedSheet!.values
         .insertValue(toUpload, column: columnNumber, row: rowNumber);
