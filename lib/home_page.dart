@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_card.dart';
+import 'package:documentation_assistant/comment_page.dart';
 import 'package:documentation_assistant/feces_page.dart';
 import 'package:documentation_assistant/main.dart';
 import 'package:documentation_assistant/resources.dart';
@@ -134,7 +135,7 @@ class MyHomePageState extends State<MyHomePage> {
                     context: context,
                     initialDate: selectedDate,
                     firstDate: DateTime(2023, 5),
-                    lastDate: DateTime(2023, 7),
+                    lastDate: DateTime(2023, 12),
                   );
 
                   if (newDate == null) return;
@@ -191,11 +192,26 @@ class MyHomePageState extends State<MyHomePage> {
                 child: const Text('F'),
               ),
               FloatingActionButton(
+                heroTag: 'btn4',
+                onPressed: () {
+                  animalnamegenerator();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return Comment_Page(
+                        animalNames: animalNames,
+                        sheetCredentials: _credentials,
+                        sheetId: _sheetId,
+                        currentDate:
+                            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}");
+                  }));
+                },
+                child: const Text('S'),
+              ),
+              FloatingActionButton(
                 onPressed: () {
                   sheetChecker(_credentials, _sheetId, selectedDate.month,
                       selectedDate.year, animalFeedList);
                 },
-                heroTag: 'btn4',
+                heroTag: 'btn5',
                 child: Text('C'),
               )
             ],

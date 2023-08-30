@@ -1,7 +1,6 @@
 import 'package:documentation_assistant/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
-import 'animal_feces-checkbox.dart';
 
 class Feces_Page extends StatefulWidget {
   Feces_Page({
