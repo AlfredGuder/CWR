@@ -1,7 +1,4 @@
-import 'package:documentation_assistant/home_page.dart';
-import 'package:documentation_assistant/main.dart';
 import 'package:documentation_assistant/animal.dart';
-import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
 
 void sheetChecker(String sheetCredentials, String sheetId, int monthAsInt,
@@ -10,15 +7,15 @@ void sheetChecker(String sheetCredentials, String sheetId, int monthAsInt,
   final gsheets = GSheets(sheetCredentials);
 
   //fetch worksheet by ID
-  final CWRSheets = await gsheets.spreadsheet(sheetId);
+  final globalSheet = await gsheets.spreadsheet(sheetId);
 
   String searchDate = '$monthAsInt/$yearAsInt';
   //creates a new Worksheet, if one for the current month does not exeist
-  if (CWRSheets.worksheetByTitle(searchDate) == null) {
-    await CWRSheets.addWorksheet(searchDate);
-    sheetLoadoutInit(CWRSheets, searchDate, feedingList);
+  if (globalSheet.worksheetByTitle(searchDate) == null) {
+    await globalSheet.addWorksheet(searchDate);
+    sheetLoadoutInit(globalSheet, searchDate, feedingList);
   } else {
-    final currentSheet = CWRSheets.worksheetByTitle(searchDate);
+    final currentSheet = globalSheet.worksheetByTitle(searchDate);
   }
 }
 

@@ -1,24 +1,24 @@
-import 'package:documentation_assistant/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
 
-class Feces_Page extends StatefulWidget {
-  Feces_Page({
+class FecesPage extends StatefulWidget {
+  final List<String> animalNames;
+  final String sheetCredentials;
+  final String sheetId;
+  final String currentDate;
+
+  const FecesPage({
     Key? key,
     required this.animalNames,
     required this.sheetCredentials,
     required this.sheetId,
     required this.currentDate,
   }) : super(key: key);
-  List<String> animalNames;
-  String sheetCredentials;
-  String sheetId;
-  String currentDate;
   @override
-  State<Feces_Page> createState() => _Feces_PageState();
+  State<FecesPage> createState() => _FecesPageState();
 }
 
-class _Feces_PageState extends State<Feces_Page> {
+class _FecesPageState extends State<FecesPage> {
   late List<String> nameList;
   late String sheetCreds;
   late String sheetIdentifier;
@@ -41,7 +41,7 @@ class _Feces_PageState extends State<Feces_Page> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Feces"),
+        title: const Text("Feces"),
       ),
       body: Column(
         children: [
