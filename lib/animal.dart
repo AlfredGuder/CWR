@@ -1,44 +1,45 @@
 import 'dart:convert';
 
-import 'package:documentation_assistant/date_recording.dart';
-
 class Animal {
-  String name;
-  Map<String, DateRecording> gatherData;
+  String animalName;
+  int amFeed = 0;
+  int midFeed = 0;
+  int pmFeed = 0;
   String species;
   String sex;
   String arksNo;
 
   Animal(
-      {required this.name,
+      {required this.animalName,
       required this.species,
       required this.sex,
       required this.arksNo,
-      required this.gatherData});
+      required this.amFeed,
+      required this.midFeed,
+      required this.pmFeed});
 
   // Animal.fromJson(Map<String, dynamic> json)
-  //     : name = json["animalName"],
+  //     : animalName = json["animalName"],
   //       amFeed = json["amFeed"],
   //       midFeed = json["midFeed"],
   //       pmFeed = json["pmFeed"];
 
   // Animal.defaultAnimal(String name)
-  //     : name = name,
+  //     : animalName = name,
   //       amFeed = 0,
   //       midFeed = 0,
   //       pmFeed = 0;
 
-  // bool hasDefaultValues() {
-  //   return amFeed == 0 && midFeed == 0 && pmFeed == 0;
-  // }
+  bool hasDefaultValues() {
+    return amFeed == 0 && midFeed == 0 && pmFeed == 0;
+  }
 
   String toJson() {
     Map<String, dynamic> outMap = {
-      "animalName": name,
-      "gatherData": gatherData,
-      "arksNo": arksNo,
-      "sex": sex,
-      "species": species,
+      "animalName": animalName,
+      "amFeed": amFeed,
+      "midFeed": midFeed,
+      "pmFeed": pmFeed
     };
 
     String out = jsonEncode(outMap);
@@ -47,46 +48,21 @@ class Animal {
     return out;
   }
 
-  // @override
-  // String toString() {
-  //   return '''
-  //   Animal:
-  //     animalName: $name
-  //     amFeed: $amFeed
-  //     midFeed: $midFeed
-  //     pmFeed: $pmFeed
-  //   ''';
-  // }
-
-  int amFeed(String currentDate) {
-    return gatherData[currentDate]?.gram[0] ?? 0;
+  @override
+  String toString() {
+    return '''
+    Animal:
+      animalName: $animalName
+      amFeed: $amFeed
+      midFeed: $midFeed
+      pmFeed: $pmFeed
+    ''';
   }
 
-  int midFeed(String currentDate) {
-    return gatherData[currentDate]?.gram[1] ?? 0;
-  }
-
-  int pmFeed(String currentDate) {
-    return gatherData[currentDate]?.gram[2] ?? 0;
-  }
-
-  bool hasGatherDataForDate(String receivedDate) {
-    return gatherData.containsKey(receivedDate);
-  }
-
-  void createNewDateRecording(String receivedDate) {
-    gatherData[receivedDate] = DateRecording.createDefaultRecording();
-  }
-
-  void setAmFeedForDate(String receivedDate, int weightToSet) {
-    gatherData[receivedDate]?.gram[0] = weightToSet;
-  }
-
-  void setMidFeedForDate(String receivedDate, int weightToSet) {
-    gatherData[receivedDate]?.gram[1] = weightToSet;
-  }
-
-  void setPmFeedForDate(String receivedDate, int weightToSet) {
-    gatherData[receivedDate]?.gram[2] = weightToSet;
-  }
+  // static List<Animal> dummyData = [
+  //   Animal(animalName: "Willa", amFeed: 0, midFeed: 0, pmFeed: 0),
+  //   Animal(animalName: "Valora", amFeed: 0, midFeed: 0, pmFeed: 0),
+  //   Animal(animalName: "Xayla", amFeed: 0, midFeed: 0, pmFeed: 0),
+  //   Animal(animalName: "Cho gath", amFeed: 0, midFeed: 0, pmFeed: 5)
+  // ];
 }

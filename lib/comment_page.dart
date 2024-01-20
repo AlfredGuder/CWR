@@ -1,185 +1,253 @@
-import 'package:documentation_assistant/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
+import 'resources.dart';
 
 class Comment_Page extends StatefulWidget {
-  Comment_Page({
+  final List<String> animalNameList;
+
+  final DateTime currentDate;
+
+  const Comment_Page({
     Key? key,
-    required this.animalNames,
-    required this.sheetCredentials,
-    required this.sheetId,
+    required this.animalNameList,
     required this.currentDate,
   }) : super(key: key);
-
-  List<String> animalNames;
-  String sheetCredentials;
-  String sheetId;
-  String currentDate;
 
   @override
   State<Comment_Page> createState() => _Comment_PageState();
 }
 
 class _Comment_PageState extends State<Comment_Page> {
-  late List<String> nameList;
+  late List<String> animalNameList;
   late String sheetCreds;
   late String sheetIdentifier;
-  late String useDate;
-  late TextEditingController commentController;
+  late DateTime useDate;
+  late TextEditingController controller;
+  List<String> commentList = ['testAwe']; //TODO fix this
   Map<String, List<String>> animalCommentMap = {};
-  Map<String, int> animalCommentCounterMap = {};
-  int commentCounter = 0;
+
+  bool isDataLoading = false;
 
   @override
   void initState() {
     super.initState();
-    nameList = widget.animalNames;
-    sheetCreds = widget.sheetCredentials;
-    sheetIdentifier = widget.sheetId;
-    useDate = widget.currentDate;
-    commentController = TextEditingController();
-    for (int i = 0; i < nameList.length; i++) {
-      animalCommentMap.putIfAbsent(nameList[i], () => []);
-    }
-    //creates a loop to load the current animalcomments into a counter list
-    for (int i = 0; i < nameList.length; i++) {
-      commentCounter = animalCommentMap[nameList[i]]!.length;
-      animalCommentCounterMap[nameList[i]] = commentCounter;
-    }
-  }
+    animalNameList = widget.animalNameList;
 
-  @override
-  void dispose() {
-    commentController.dispose();
-    super.dispose();
+    useDate = widget.currentDate;
+    controller = TextEditingController();
+    commentMapBuilder();
+    //generateCommentMap();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Comments'),
-      ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text('return'),
-          ),
-          ElevatedButton(onPressed: () {}, child: const Text('maptest')),
-          ListView.builder(
-              shrinkWrap: true,
-              itemCount: nameList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        appBar: AppBar(
+          title: const Text('Comments'),
+        ),
+        body: Center(
+          child: FutureBuilder(
+            initialData: false,
+            future: isDataLoading ? null : generateCommentMap(),
+            builder: (context, snapshot) {
+              if (isDataLoading == true) {
+                return Column(
                   children: [
-                    Text(nameList[index]),
-                    Text(animalCommentCounterMap[nameList[index]].toString()),
-                    FloatingActionButton(
-                      //Animal? animalToUpdate = await animalPicker(selectedDate)
-                      onPressed: () async {
-                        String additionalComment =
-                            await animalCommentViewer(nameList[index]);
-                        animalCommentMap[nameList[index]]!
-                            .add(additionalComment);
-                        setState(() {});
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
                       },
-                      heroTag: 'annimalCommentButton${nameList[index]}',
-                      child: const Text('add comment'),
+                      child: const Text('Return'),
                     ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: animalNameList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(animalNameList[index]),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  await commentScreen(animalNameList[index]);
+                                },
+                                child: const Text('Check'),
+                              ),
+                            ],
+                          );
+                        })
                   ],
                 );
-              })
-        ],
-      ),
-    );
+              } else {
+                return const Text("Loading...");
+              }
+            },
+          ),
+        ));
+  }
+  //
+
+  void commentMapBuilder() {
+    for (int i = 0; i < animalNameList.length; i++) {
+      animalCommentMap.putIfAbsent(animalNameList[i], () => []);
+    }
   }
 
-  List<String> tempCommentList = [];
+  Future<bool?> generateCommentMap() async {
+    //
+    //add laoding indicatior
 
-  //Creates a popup window, showing currently stored comments for a specific animal
-  Future animalCommentViewer(String animalName) => showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('$animalName comment list'),
-          content: SizedBox(
-            height: 300,
-            width: double.maxFinite,
-            child: Column(
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: animalCommentMap[animalName]!.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Row(
-                      //mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(animalCommentMap[animalName]![index]),
-                        FloatingActionButton(
-                          onPressed:
-                              () {}, //TODO add function to remove a comment
-                          child: Text('remove'),
-                          heroTag: 'button$index',
-                        ),
-                        //TODO add a button to accept a new string from user and add it to the list
-                      ],
-                    );
-                  },
-                ),
-                FloatingActionButton(
-                    onPressed: () async {
-                      // for (int i = 0;
-                      //     i < animalCommentMap[animalName]!.length;
-                      //     i++) {
-                      //   tempCommentList[i] = animalCommentMap[animalName]![i];
-                      // }
-                      String newComment = await animalCommentAdd();
+    String searchDate = useDate.day.toString();
+    Worksheet currentWorksheet = await SheetService.getWorkSheetByDate(useDate);
+    for (int i = 0; i < animalNameList.length; i++) {
+      String currentAnimal = animalNameList[i];
+      int currentAnimalStartingRow =
+          await currentWorksheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+      int commentRow =
+          currentAnimalStartingRow + (3 * int.parse(searchDate) - 1);
+      String receivedCommentString =
+          await currentWorksheet.values.value(column: 7, row: commentRow);
 
-                      //tempCommentList.add(newComment);
+      if (receivedCommentString == 'No comments for today') {
+        animalCommentMap[currentAnimal]!.add(receivedCommentString);
+      } else {
+        List<String> spltCommentStringList = receivedCommentString.split('//');
+        for (int j = 0; j < spltCommentStringList.length; j++) {
+          animalCommentMap[currentAnimal]!.add(spltCommentStringList[i]);
+        }
+      }
 
-                      Navigator.of(context).pop(newComment);
-                      // if (mounted) {
-                      //   Navigator.of(context).pop();
-                      // }
+      //animalCommentMap[currentAnimal]!.add(receivedCommentString);
+    }
+    setState(() {
+      isDataLoading = true;
+    });
+    return true;
+  }
 
-                      //animalCommentMap[animalName]!.add(newComment);
-                      //Navigator.of(context).pop();
-                    },
-                    heroTag: 'addComment',
-                    child: const Text('add')),
-              ],
-            ),
-          ),
-        ),
-      );
-
-  Future animalCommentAdd() async {
+  Future commentScreen(String currentAnimal) async {
     showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Comments for $currentAnimal'),
+              content: SizedBox(
+                height: 200,
+                width: double.maxFinite,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: animalCommentMap[currentAnimal]!
+                        .length, //TODO fix this error
+                    itemBuilder: (BuildContext context, int index) {
+                      return Column(
+                        children: [
+                          Text(animalCommentMap[currentAnimal]![index]),
+                        ],
+                      );
+                    }),
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel')),
+                    ElevatedButton(
+                        onPressed: () {
+                          removeButton(currentAnimal);
+                          setState(() {});
+                        },
+                        child: const Text('Remove')),
+                    ElevatedButton(
+                        onPressed: () async {
+                          String newPotentialComment =
+                              await commentAdder() ?? '';
+                          if (newPotentialComment != '') {
+                            setState(() {
+                              if (animalCommentMap[currentAnimal]![0] ==
+                                  'No comments for today') {
+                                animalCommentMap[currentAnimal]!.removeAt(0);
+                              }
+
+                              animalCommentMap[currentAnimal]!
+                                  .add(newPotentialComment);
+                            });
+                          }
+                        },
+                        child: const Text('Add')),
+                    ElevatedButton(
+                        onPressed: () {
+                          saveCommentString(currentAnimal);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Save')),
+                  ],
+                )
+              ],
+            );
+          });
+        });
+  }
+
+  void removeButton(String currentAnimal) {
+    animalCommentMap[currentAnimal]!.removeLast();
+    if (animalCommentMap[currentAnimal]!.isEmpty) {
+      animalCommentMap[currentAnimal]!.add('No comments for today');
+    }
+
+    saveCommentString(currentAnimal);
+  }
+
+  void saveCommentString(String currentAnimal) async {
+    String uploadString = '';
+    String searchDate = useDate.day.toString();
+    Worksheet currentWorkSheet = await SheetService.getWorkSheetByDate(useDate);
+    int currentAnimalStartingRow =
+        await currentWorkSheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+    int commentRow = currentAnimalStartingRow + (3 * int.parse(searchDate) - 1);
+
+    if (animalCommentMap[currentAnimal]!.length == 1) {
+      uploadString = animalCommentMap[currentAnimal]![0];
+    } else {
+      for (int i = 0; i < animalCommentMap[currentAnimal]!.length; i++) {
+        uploadString = '$uploadString//${animalCommentMap[currentAnimal]![i]}';
+      }
+    }
+    currentWorkSheet.values
+        .insertValue(uploadString, column: 7, row: commentRow);
+
+    uploadString = '';
+  }
+
+  Future<String?> commentAdder() => showDialog<String?>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Enter new comment'),
-        content: TextField(
-          autofocus: true,
-          controller: commentController,
-          keyboardType: TextInputType.multiline,
-        ),
-        actions: [
-          FloatingActionButton(
-            onPressed: submitComment,
-            child: const Text('Add'),
-          )
-        ],
-      ),
-    );
-  }
+            title: const Text('Write new comment'),
+            content: TextField(
+              autofocus: true,
+              controller: controller,
+              keyboardType: TextInputType.text,
+            ),
+            actions: [
+              FloatingActionButton(
+                onPressed: submitComment,
+                //return controller.text;
+                //controller.clear();
+
+                heroTag: 'submitButton',
+                child: const Text('Submit'),
+              )
+            ],
+          ));
 
   void submitComment() {
     Navigator.of(context).pop(
-      commentController.text,
+      controller.text,
     );
+    controller.clear();
   }
 }

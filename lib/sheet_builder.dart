@@ -1,53 +1,20 @@
 import 'package:documentation_assistant/animal.dart';
+import 'package:documentation_assistant/resources.dart';
 import 'package:gsheets/gsheets.dart';
 
-void sheetChecker(String sheetCredentials, String sheetId, int monthAsInt,
-    int yearAsInt, List<Animal> feedingList) async {
-  //init gsheets
-  final gsheets = GSheets(sheetCredentials);
-
-  //fetch worksheet by ID
-  final globalSheet = await gsheets.spreadsheet(sheetId);
-
-  String searchDate = '$monthAsInt/$yearAsInt';
-  //creates a new Worksheet, if one for the current month does not exeist
-  if (globalSheet.worksheetByTitle(searchDate) == null) {
-    await globalSheet.addWorksheet(searchDate);
-    sheetLoadoutInit(globalSheet, searchDate, feedingList);
-  } else {
-    final currentSheet = globalSheet.worksheetByTitle(searchDate);
-  }
-}
-
-void sheetLoadoutInit(Spreadsheet receivedSheet, String receivedDate,
-    List<Animal> animalList) async {
-  final currentSheet = receivedSheet.worksheetByTitle(receivedDate);
+Future<bool> sheetLoadoutInit(DateTime receivedDate, List<Animal> animalList,
+    Worksheet currentSheet) async {
+  //TODO refactor code so that sheetLoadoutInit launches only when creating a new sheet
+  //final currentSheet = await SheetService.getWorkSheetByDate(receivedDate);
   //date builder
-  int currentMonth = int.parse(receivedDate.split('/')[0]);
-  int currentYear = int.parse(receivedDate.split('/')[1]);
+  int currentMonth = receivedDate.month;
 
   //determines the amount of entries required for the month
-  int daysOfMonth = 0;
-  if (currentMonth == 2) {
-    daysOfMonth = 28;
-  } else if (currentMonth == 1 ||
-      currentMonth == 3 ||
-      currentMonth == 5 ||
-      currentMonth == 7 ||
-      currentMonth == 8 ||
-      currentMonth == 10 ||
-      currentMonth == 12) {
-    daysOfMonth = 31;
-  } else if (currentMonth == 4 ||
-      currentMonth == 6 ||
-      currentMonth == 9 ||
-      currentMonth == 11) {
-    daysOfMonth = 30;
-  }
+  int daysOfMonth = currentMonth.asMonth()!.days();
 
   //writes title to 1:1 on sheet
   //TODO merging cells A1 to G1 still required
-  await currentSheet!.values
+  await currentSheet.values
       .insertValue('Feeding Monitoring Sheet', column: 1, row: 1);
 
   int nextRow = 2;
@@ -60,7 +27,7 @@ void sheetLoadoutInit(Spreadsheet receivedSheet, String receivedDate,
       'Sex',
       animalList[i].sex,
       'Name',
-      animalList[i].name,
+      animalList[i].animalName,
       'Arks nr:',
       animalList[i].arksNo,
     ];
@@ -77,16 +44,16 @@ void sheetLoadoutInit(Spreadsheet receivedSheet, String receivedDate,
       'Feces',
       'Weight',
       'Parasite',
-      'Commens'
+      'Comments'
     ];
-    int daysToAdd = daysOfMonth + 2;
+
     await currentSheet.values.insertRow(nextRow, secondRowValues);
 
     nextRow = await finalRowChecker(currentSheet);
 
     //adds a collumn with the dates for the selected month
     List<String> dateCollumnString = [];
-    for (int i = 1; i < daysToAdd; i++) {
+    for (int i = 1; i <= daysOfMonth; i++) {
       dateCollumnString.add('$i/$currentMonth');
       dateCollumnString.add(' ');
       dateCollumnString.add(' ');
@@ -98,11 +65,38 @@ void sheetLoadoutInit(Spreadsheet receivedSheet, String receivedDate,
     //adds a collumn with the Am Mid and Pm title for each day
 
     List<String> feedCollumnString = [];
-    for (int i = 1; i < daysToAdd; i++) {
+    for (int i = 1; i <= daysOfMonth; i++) {
       feedCollumnString.add('AM');
       feedCollumnString.add('MID');
       feedCollumnString.add('PM');
     }
+
+    List<String> noCommentString = [];
+    for (int i = 0; i <= daysOfMonth; i++) {
+      noCommentString.add('No comments for today');
+      noCommentString.add(' ');
+      noCommentString.add(' ');
+    }
+
+    List<String> defaultFeedingValueString = [];
+    for (int i = 1; i <= daysOfMonth; i++) {
+      defaultFeedingValueString.add('0');
+      defaultFeedingValueString.add('0');
+      defaultFeedingValueString.add('0');
+    }
+
+    List<String> defaultFecesValueString = [];
+    for (int i = 1; i <= daysOfMonth; i++) {
+      defaultFecesValueString.add('No');
+      defaultFecesValueString.add("");
+      defaultFecesValueString.add("");
+    }
+
+    await currentSheet.values.insertColumn(
+      4,
+      defaultFecesValueString,
+      fromRow: nextRow,
+    );
 
     await currentSheet.values.insertColumn(
       2,
@@ -110,8 +104,15 @@ void sheetLoadoutInit(Spreadsheet receivedSheet, String receivedDate,
       fromRow: nextRow,
     );
 
+    await currentSheet.values
+        .insertColumn(7, noCommentString, fromRow: nextRow);
+
+    await currentSheet.values
+        .insertColumn(3, defaultFeedingValueString, fromRow: nextRow);
+
     nextRow = await finalRowChecker(currentSheet);
   }
+  return true;
 }
 
 finalRowChecker(Worksheet userSheet) async {

@@ -1,17 +1,17 @@
+//import 'dart:ffi';
+
+import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
 
 class FecesPage extends StatefulWidget {
   final List<String> animalNames;
-  final String sheetCredentials;
-  final String sheetId;
-  final String currentDate;
+
+  final DateTime currentDate;
 
   const FecesPage({
     Key? key,
     required this.animalNames,
-    required this.sheetCredentials,
-    required this.sheetId,
     required this.currentDate,
   }) : super(key: key);
   @override
@@ -20,69 +20,22 @@ class FecesPage extends StatefulWidget {
 
 class _FecesPageState extends State<FecesPage> {
   late List<String> nameList;
-  late String sheetCreds;
-  late String sheetIdentifier;
-  late String useDate;
+
+  late DateTime useDate;
 
   late List<bool> animalFecesCheckList = List.filled(nameList.length, false);
   late List<String> animalFecesButtonState = List.filled(nameList.length, "No");
 
-  @override
-  void initState() {
-    super.initState();
-    nameList = widget.animalNames;
-    sheetCreds = widget.sheetCredentials;
-    sheetIdentifier = widget.sheetId;
-    useDate = widget.currentDate;
-    checkFecesList();
-  }
+  bool isDataLoading = false;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Feces"),
-      ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Return'),
-          ),
-          ListView.builder(
-              shrinkWrap: true,
-              itemCount: nameList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(nameList[index]),
-                    FloatingActionButton(
-                      heroTag: 'fecesCheckButton$index',
-                      onPressed: () => updateFecesList(index),
-                      child: Text(animalFecesButtonState[index]),
-                    )
-                  ],
-                );
-              }),
-          ElevatedButton(
-            onPressed: saveToSheet,
-            child: const Text('sheet'),
-          )
-        ],
-      ),
-    );
-  }
+  Future<bool>? checkFecesList() async {
+    // setState(() {
+    //   isDataLoading = true;
+    // });
 
-  void checkFecesList() async {
     List<bool> tempCheckList = List.filled(nameList.length, false);
-    final gsheets = GSheets(sheetCreds);
-    final currentSpreasheet = await gsheets.spreadsheet(sheetIdentifier);
-    final String dateByMonthYear =
-        '${useDate.split('/')[1]}/${useDate.split('/')[2]}';
-    var currentWorksheet = currentSpreasheet.worksheetByTitle(dateByMonthYear);
+
+    Worksheet currentWorksheet = await SheetService.getWorkSheetByDate(useDate);
     //String dateToCheck = '${useDate.split('/')[0]}/${useDate.split(' / ')[1]}';
     //bool animalFecesState = false;
     for (int i = 0; i < nameList.length; i++) {
@@ -94,28 +47,100 @@ class _FecesPageState extends State<FecesPage> {
 
       String currentAnimal = nameList[i];
       int currentAnimalStartRow =
-          await currentWorksheet!.values.rowIndexOf(currentAnimal, inColumn: 6);
-      int rowToCheck =
-          currentAnimalStartRow + (3 * int.parse(useDate.split('/')[0])) - 1;
+          await currentWorksheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+      int rowToCheck = currentAnimalStartRow + (3 * useDate.day) - 1;
 
       String receivedValue =
           await currentWorksheet.values.value(column: 4, row: rowToCheck);
       if (receivedValue == 'Yes') {
         tempCheckList[i] = true;
       } else if (receivedValue == 'No') {
-        tempCheckList[i] == false;
+        tempCheckList[i] = false;
       }
     }
+    // setState(() {
+    //   animalFecesCheckList = tempCheckList;
+
+    // });
+
     setState(() {
-      animalFecesCheckList = tempCheckList;
       for (int i = 0; i < animalFecesCheckList.length; i++) {
-        if (animalFecesCheckList[i] == true) {
+        if (tempCheckList[i] == true) {
           animalFecesButtonState[i] = 'Yes';
-        } else if (animalFecesCheckList[i] == false) {
+        } else if (tempCheckList[i] == false) {
           animalFecesButtonState[i] = 'No';
         }
       }
+
+      isDataLoading = true;
     });
+
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    nameList = widget.animalNames;
+
+    useDate = widget.currentDate;
+
+    // animalFecesCheckList = List.filled(nameList.length, false);
+    // animalFecesButtonState = List.filled(nameList.length, "No");
+
+    //checkFecesList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Feces"),
+        ),
+        body: Center(
+          child: FutureBuilder<bool>(
+            initialData: false,
+            future: isDataLoading ? null : checkFecesList(),
+            builder: (context, snapshot) {
+              // snapshot.connectionState == ConnectionState.done
+              if (isDataLoading == true) {
+                //int data = snapshot.data!;
+                return Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Return'),
+                    ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: nameList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(nameList[index]),
+                              FloatingActionButton(
+                                heroTag: 'fecesCheckButton$index',
+                                onPressed: () => updateFecesList(index),
+                                child: Text(animalFecesButtonState[index]),
+                              )
+                            ],
+                          );
+                        }),
+                    ElevatedButton(
+                      onPressed: () => saveToSheet(useDate),
+                      child: const Text('sheet'),
+                    )
+                  ],
+                );
+              } else {
+                return const Text("Loading...");
+              }
+            },
+          ),
+        ));
   }
 
   void updateFecesList(int animalNumber) {
@@ -143,19 +168,15 @@ class _FecesPageState extends State<FecesPage> {
     print(animalFecesCheckList[animalNumber]);
   }
 
-  void saveToSheet() async {
-    final gsheets = GSheets(sheetCreds);
-    final currentSpreasheet = await gsheets.spreadsheet(sheetIdentifier);
-    final String dateByMonthYear =
-        '${useDate.split('/')[1]}/${useDate.split('/')[2]}';
-    var currentWorksheet = currentSpreasheet.worksheetByTitle(dateByMonthYear);
+  void saveToSheet(DateTime receivedDate) async {
+    Worksheet currentWorksheet =
+        await SheetService.getWorkSheetByDate(receivedDate);
     for (int i = 0; i < nameList.length; i++) {
       String uploadValue = '';
       String currentAnimal = nameList[i];
       int currentAnimalStartRow =
-          await currentWorksheet!.values.rowIndexOf(currentAnimal, inColumn: 6);
-      int rowToUpdate =
-          currentAnimalStartRow + (3 * int.parse(useDate.split('/')[0])) - 1;
+          await currentWorksheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+      int rowToUpdate = currentAnimalStartRow + (3 * useDate.day) - 1;
       if (animalFecesCheckList[i] == false) {
         uploadValue = 'No';
       } else if (animalFecesCheckList[i] == true) {

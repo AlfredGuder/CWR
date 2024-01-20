@@ -1,76 +1,91 @@
+import 'dart:convert';
+
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:documentation_assistant/comment_page.dart';
-import 'package:documentation_assistant/feces_page.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:documentation_assistant/sheet_builder.dart';
+import 'package:documentation_assistant/feces_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:hive/hive.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage(
-      {Key? key, required this.sheetCredentials, required this.sheetId})
-      : super(key: key);
-  final String sheetCredentials;
-  final String sheetId;
-  //const MyHomePage({super.key});
-  //Feces_Page({Key? key, required this.animalNames}) : super(key: key);
-  //List<String> animalNames;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => MyHomePageState();
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  late String _credentials;
-  late String _sheetId;
+  final _myBox = Hive.box("animalFeedBox");
   late TextEditingController controller;
   String feedChoice = "MID";
   String animalChoice = "Willa";
   DateTime selectedDate = DateTime.now();
   int firstDay = 0;
 
-  List<Animal> animalFeedList = [
-    Animal(
-        name: "Willa",
-        species: 'Cheetah',
-        sex: 'F',
-        arksNo: '1',
-        gatherData: {}),
-    Animal(
-        name: "Valora",
-        species: 'Cheetah',
-        sex: 'F',
-        arksNo: '2',
-        gatherData: {}),
-    Animal(
-        name: "Xayla",
-        species: 'Cheetah',
-        sex: 'F',
-        arksNo: '3',
-        gatherData: {}),
-    Animal(
-        name: "Cho gath",
-        species: 'Cheetah',
-        sex: 'M',
-        arksNo: '4',
-        gatherData: {})
-  ];
+  bool isDataLoading = false;
+  bool isFeedListBuilt = false;
 
-  List<String> animalNames = [];
+  List<Animal> animalFeedList = [];
+//
+  // List<Animal> animalFeedList = [
+  //   Animal(
+  //       animalName: "Thane",
+  //       amFeed: 0,
+  //       midFeed: 0,
+  //       pmFeed: 0,
+  //       species: 'cheetah',
+  //       sex: 'male',
+  //       arksNo: '1'),
+  //   Animal(
+  //       animalName: "Valora",
+  //       amFeed: 0,
+  //       midFeed: 0,
+  //       pmFeed: 0,
+  //       species: 'cheetah',
+  //       sex: 'female',
+  //       arksNo: '2'),
+  //   Animal(
+  //       animalName: "T'Challa",
+  //       amFeed: 0,
+  //       midFeed: 0,
+  //       pmFeed: 0,
+  //       species: 'cheetah',
+  //       sex: 'male',
+  //       arksNo: '3'),
+  //   Animal(
+  //       animalName: "Xena",
+  //       amFeed: 0,
+  //       midFeed: 0,
+  //       pmFeed: 0,
+  //       species: 'cheetah',
+  //       sex: 'female',
+  //       arksNo: '4'),
+  //   Animal(
+  //       animalName: "Xion",
+  //       amFeed: 0,
+  //       midFeed: 0,
+  //       pmFeed: 0,
+  //       species: 'cheetah',
+  //       sex: 'male',
+  //       arksNo: '5'),
+  //   Animal(
+  //       animalName: "Xavier",
+  //       amFeed: 0,
+  //       midFeed: 0,
+  //       pmFeed: 0,
+  //       species: 'cheetah',
+  //       sex: 'male',
+  //       arksNo: '6'),
+  // ];
 
-  void animalnamegenerator() {
-    for (int i = 0; i < animalFeedList.length; i++) {
-      if (animalNames.length < animalFeedList.length) {
-        animalNames.add("tempanimal");
-      }
-
-      //Animal animal in animalFeedList
-      //animalNames.add(animal.animalName);
-      animalNames[i] = animalFeedList[i].name;
-    }
+  Future<bool> animalFeedListGenerator() async {
+    animalFeedList = await SheetService.animalFeedListBuilder();
+    isFeedListBuilt = true;
+    return true;
   }
 
   String extractDate(DateTime receivedDate) {
@@ -79,13 +94,8 @@ class MyHomePageState extends State<MyHomePage> {
     return Resources.hiveDataFormat.format(receivedDate);
   }
 
-  void getDataForDate(DateTime checkDate, {bool displaySnackBar = true}) {
+  void dateEditingCheck(DateTime checkDate, {bool displaySnackBar = true}) {
     String useDate = extractDate(checkDate);
-    for (int i = 0; i < animalFeedList.length; i++) {
-      if (!animalFeedList[i].hasGatherDataForDate(useDate)) {
-        animalFeedList[i].createNewDateRecording(useDate);
-      }
-    }
 
     // Map<String, Animal> feedData = readAnimalsFromDate(checkDate);
     // if (displaySnackBar) {
@@ -95,14 +105,31 @@ class MyHomePageState extends State<MyHomePage> {
     //     showSnackBar("Read data for ${feedData.length} animals");
     //   }
     // }
+    // for (Animal animal in animalFeedList) {
+    //   String currentAnimalName = animal.animalName;
+    //   Animal newAnimalData = feedData[currentAnimalName] ??
+    //       Animal.defaultAnimal(currentAnimalName);
+
+    //   animal.amFeed = newAnimalData.amFeed;
+    //   animal.midFeed = newAnimalData.midFeed;
+    //   animal.pmFeed = newAnimalData.pmFeed;
+    // }
   }
 
   @override
   void initState() {
     super.initState();
-    _credentials = widget.sheetCredentials;
-    _sheetId = widget.sheetId;
-    getDataForDate(selectedDate, displaySnackBar: false);
+    //animalNames = extractAnimalNames(animalFeedList);
+
+    //sheetLoadoutInit(selectedDate, animalFeedList);
+
+    //SheetService.checkSheetforDate(selectedDate, animalFeedList);
+    // getFeedingDataByDate(
+    //   selectedDate,
+    //   animalNames,
+    // );
+    //dateEditingCheck(selectedDate, displaySnackBar: false);
+
     controller = TextEditingController();
   }
 
@@ -119,111 +146,153 @@ class MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text("Animals"),
       ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                  "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
-              ElevatedButton(
-                onPressed: () async {
-                  DateTime? newDate = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(2023, 5),
-                    lastDate: DateTime(2023, 12),
-                  );
+      body: FutureBuilder<bool>(
+        initialData: false,
+        future: isFeedListBuilt ? null : animalFeedListGenerator(),
+        builder: ((context, snapshot) {
+          if (isFeedListBuilt == true) {
+            animalNames = extractAnimalNames(animalFeedList);
+            return FutureBuilder(
+                initialData: false,
+                future: isDataLoading
+                    ? null
+                    : getFeedingDataByDate(selectedDate, animalNames),
+                builder: (context, snapshot) {
+                  if (isDataLoading == true) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                  "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  DateTime? newDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: selectedDate,
+                                    firstDate: DateTime(2023),
+                                    lastDate: DateTime(2024, 12),
+                                  );
 
-                  if (newDate == null) return;
-                  getDataForDate(newDate);
-                  setState(
-                    (() => selectedDate = newDate),
-                  );
-                },
-                child: const Text("C"),
-              ),
-            ],
-          ),
-          AnimalCard(animalFeedList, selectedDate),
-          Row(
-            children: [
-              FloatingActionButton(
-                onPressed: () async {
-                  Animal? animalToUpdate = await animalPicker(selectedDate);
-                  if (animalToUpdate != null) {
-                    int animalIndex = animalFeedList.indexWhere(
-                        (Animal animal) => animal.name == animalToUpdate.name);
-                    setState(() {
-                      animalFeedList[animalIndex] = animalToUpdate;
-                    });
-                    controller.clear();
-                  }
-                },
-                child: const Text("Add"),
-              ),
-              FloatingActionButton(
-                heroTag: 'btn1',
-                onPressed: () {}, //saveData,
-                child: const Text("Save"),
-              ),
-              FloatingActionButton(
-                heroTag: 'btn2',
-                onPressed: saveSheet(selectedDate),
-                child: const Text('sheet'),
-              ),
-              FloatingActionButton(
-                heroTag: 'btn3',
-                onPressed: () {
-                  animalnamegenerator();
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FecesPage(
-                      animalNames: animalNames,
-                      sheetCredentials: _credentials,
-                      sheetId: _sheetId,
-                      currentDate:
-                          "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+                                  if (newDate == null) return;
+
+                                  //getFeedingDataByDate(newDate, animalNames);
+                                  isDataLoading = false;
+                                  setState(
+                                    (() => selectedDate = newDate),
+                                  );
+                                },
+                                child: const Text("C"),
+                              ),
+                            ],
+                          ),
+                          AnimalCard(animalFeedList),
+                          Row(
+                            children: [
+                              FloatingActionButton(
+                                heroTag: 'animalFeedButton',
+                                onPressed: () async {
+                                  Animal? animalToUpdate = await animalPicker();
+                                  if (animalToUpdate != null) {
+                                    int animalIndex = animalFeedList.indexWhere(
+                                        (Animal animal) =>
+                                            animal.animalName ==
+                                            animalToUpdate.animalName);
+                                    setState(() {
+                                      animalFeedList[animalIndex] =
+                                          animalToUpdate;
+                                    });
+                                    controller.clear();
+                                  }
+                                },
+                                child: const Text("Add"),
+                              ),
+                              FloatingActionButton(
+                                heroTag: 'saveButton',
+                                onPressed: () {
+                                  saveData(selectedDate, animalNames);
+                                },
+                                child: const Text("Save"),
+                              ),
+                              FloatingActionButton(
+                                heroTag: 'feedlistbuilder',
+                                onPressed: () async {
+                                  bool testresults =
+                                      await animalFeedListGenerator();
+                                  print(animalFeedList);
+                                },
+                                child: const Text("Tester"),
+                              ),
+
+                              // FloatingActionButton(
+                              //   onPressed: () {
+                              //     sheetLoadoutInit(selectedDate, animalFeedList, );
+                              //     Navigator.push(context,
+                              //         MaterialPageRoute(builder: (context) {
+                              //       return Comment_Page(
+                              //         animalNameList: animalNames,
+                              //         currentDate: selectedDate,
+                              //       );
+                              //     }));
+                              //   },
+                              //   heroTag: 'btn5',
+                              //   child: const Text('C'),
+                              // ),
+                              FloatingActionButton(
+                                heroTag: 'btn3',
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return FecesPage(
+                                      animalNames: animalNames,
+                                      currentDate: selectedDate,
+                                    );
+                                  }));
+                                },
+                                child: const Text('F'),
+                              ),
+                              FloatingActionButton(
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return Comment_Page(
+                                      animalNameList: animalNames,
+                                      currentDate: selectedDate,
+                                    );
+                                  }));
+                                },
+                                heroTag: 'commentbtn',
+                                child: const Text('Co'),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     );
-                  }));
-                },
-                child: const Text('F'),
-              ),
-              FloatingActionButton(
-                heroTag: 'btn4',
-                onPressed: () {
-                  animalnamegenerator();
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return Comment_Page(
-                        animalNames: animalNames,
-                        sheetCredentials: _credentials,
-                        sheetId: _sheetId,
-                        currentDate:
-                            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}");
-                  }));
-                },
-                child: const Text('S'),
-              ),
-              FloatingActionButton(
-                onPressed: () {
-                  sheetChecker(_credentials, _sheetId, selectedDate.month,
-                      selectedDate.year, animalFeedList);
-                },
-                heroTag: 'btn5',
-                child: Text('C'),
-              )
-            ],
-          )
-        ],
+                  } else {
+                    return const Text('fetching feeding data');
+                  }
+                });
+          } else {
+            return const Text("Fethcing list of animals...");
+          }
+        }),
       ),
     );
   }
 
-  Future<Animal?> animalPicker(DateTime updateDate) => showDialog(
+  List<String> animalNames = [];
+  List<String> extractAnimalNames(List<Animal> animalList) =>
+      animalList.map((animal) => animal.animalName).toList();
+
+  Future<Animal?> animalPicker() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Pick Animal:"),
           content: SizedBox(
-            height: 300,
+            height: 200,
             width: double.maxFinite,
             child: ListView.builder(
                 shrinkWrap: true,
@@ -234,29 +303,27 @@ class MyHomePageState extends State<MyHomePage> {
                       ElevatedButton(
                         onPressed: () async {
                           Animal animal = animalFeedList[index];
-                          String animalName = animal.name;
+                          String animalName = animal.animalName;
                           //print(animalChoice);
 
                           int animalIndex = animalFeedList.indexWhere(
-                              (Animal animal) => animal.name == animalName);
+                              (Animal animal) =>
+                                  animal.animalName == animalName);
                           //int animalIndex = animalIndexChooser(animalChoice, 0);
                           List<String> data =
                               (await feedTimePicker(animalIndex)).split(",");
                           if (data[1] == "AM") {
-                            animal.setAmFeedForDate(
-                                updateDate.toString(), int.parse(data[0]));
+                            animal.amFeed = int.parse(data[0]);
                           } else if (data[1] == "MID") {
-                            animal.setMidFeedForDate(
-                                updateDate.toString(), int.parse(data[0]));
+                            animal.midFeed = int.parse(data[0]);
                           } else if (data[1] == "PM") {
-                            animal.setPmFeedForDate(
-                                updateDate.toString(), int.parse(data[0]));
+                            animal.pmFeed = int.parse(data[0]);
                           }
                           if (mounted) {
                             Navigator.of(context).pop(animal);
                           }
                         },
-                        child: Text(animalFeedList[index].name),
+                        child: Text(animalFeedList[index].animalName),
                       )
                     ],
                   );
@@ -297,6 +364,7 @@ class MyHomePageState extends State<MyHomePage> {
           ),
           actions: [
             FloatingActionButton(
+              heroTag: 'submitbutton',
               onPressed: submitFeedAmount,
               child: const Text("Submit"),
             )
@@ -330,52 +398,46 @@ class MyHomePageState extends State<MyHomePage> {
   //   return out;
   // }
 
-  // void saveData() async {
-  //   print(
-  //       "Saving data for ${animalFeedList.length} animals\n${animalFeedList.map((e) => e.toString()).join("\n")}");
-  //   var updateMap = {};
-  //   for (Animal animal in animalFeedList) {
-  //     if (animal.hasDefaultValues()) continue;
-  //     updateMap[animal.name] = animal.toJson();
-  //   }
-  //   String feedMap = jsonEncode(updateMap);
-
-  //   await _myBox.put(extractDate(selectedDate), feedMap);
-  //   showSnackBar("Saved data for ${updateMap.length} animals");
-  // }
-
-  saveSheet(DateTime dateTime) {
-    print("Saving data to sheet");
-    for (int animalCounter = 0;
-        animalCounter < animalFeedList.length;
-        animalCounter++,) {
-      uploadToSheet(animalCounter, dateTime);
+  void saveData(
+    DateTime receivedDate,
+    List<String> animalnameList,
+  ) async {
+    final Worksheet currentWorkSheet =
+        await SheetService.checkSheetforDate(receivedDate, animalFeedList);
+    for (int i = 0; i < animalnameList.length; i++) {
+      String currentAnimal = animalnameList[i];
+      int currentAnimalStartingRow =
+          await currentWorkSheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+      int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
+      await currentWorkSheet.values
+          .insertValue(animalFeedList[i].amFeed, column: 3, row: amFeedRow);
+      await currentWorkSheet.values.insertValue(animalFeedList[i].midFeed,
+          column: 3, row: amFeedRow + 1);
+      await currentWorkSheet.values
+          .insertValue(animalFeedList[i].pmFeed, column: 3, row: amFeedRow + 2);
     }
   }
 
-  void uploadToSheet(int animalNumber, DateTime currentDate) {
-    int updateValue = animalFeedList[animalNumber]
-        .amFeed(currentDate.toString()); //animalFeedList[animalNumber].amFeed;
-    updateSheetPartTwo(updateValue, 1, animalNumber + 1);
+  Future<bool>? getFeedingDataByDate(
+      DateTime receivedDate, List<String> animalnameList) async {
+    final currentWorkSheet =
+        await SheetService.checkSheetforDate(receivedDate, animalFeedList);
+    for (int i = 0; i < animalnameList.length; i++) {
+      String currentAnimal = animalnameList[i];
+      int currentAnimalStartingRow =
+          await currentWorkSheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+      int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
 
-    updateValue = animalFeedList[animalNumber].midFeed(currentDate.toString());
-    updateSheetPartTwo(updateValue, 2, animalNumber + 1);
-
-    updateValue = animalFeedList[animalNumber].pmFeed(currentDate.toString());
-    updateSheetPartTwo(updateValue, 3, animalNumber + 1);
-  }
-
-  void updateSheetPartTwo(int toUpload, int columnNumber, int rowNumber) async {
-    //init GSheets
-    final gsheets = GSheets(_credentials);
-
-    //fetch spreadsheet by ID
-    final glboalSheet = await gsheets.spreadsheet(_sheetId);
-
-    //fetch worksheet by title
-    var feedSheet = glboalSheet.worksheetByTitle('AnimalFeedSheet');
-
-    await feedSheet!.values
-        .insertValue(toUpload, column: columnNumber, row: rowNumber);
+      animalFeedList[i].amFeed = int.parse(
+          await currentWorkSheet.values.value(column: 3, row: amFeedRow));
+      animalFeedList[i].midFeed = int.parse(
+          await currentWorkSheet.values.value(column: 3, row: amFeedRow + 1));
+      animalFeedList[i].pmFeed = int.parse(
+          await currentWorkSheet.values.value(column: 3, row: amFeedRow + 2));
+    }
+    setState(() {
+      isDataLoading = true;
+    });
+    return true;
   }
 }
