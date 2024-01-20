@@ -78,25 +78,26 @@ class SheetService {
     for (int i = 0; i < listLength; i++) {
       int rowToCheck = 3 + i;
 
+
+      var data = await Future.wait([
+                    animalListSheet.values.value(column: 1, row: rowToCheck), //Name
+                    animalListSheet.values.value(column: 2, row: rowToCheck), //arks
+                    animalListSheet.values.value(column: 3, row: rowToCheck), //sex
+                    animalListSheet.values.value(column: 4, row: rowToCheck),] //species
+                    );
+
+
+      
       Animal newAnimalToList = Animal(
-        animalName: 'tempName',
-        arksNo: 'testNo',
-        sex: 'testGender',
-        species: 'testSpecies',
+        animalName: data[0],
+        arksNo: data[1],
+        sex: data[2],
+        species: data[3],
         amFeed: 0,
         midFeed: 0,
         pmFeed: 0,
       );
-
-      newAnimalToList.animalName =
-          await animalListSheet.values.value(column: 1, row: rowToCheck);
-      newAnimalToList.species =
-          await animalListSheet.values.value(column: 2, row: rowToCheck);
-      newAnimalToList.sex =
-          await animalListSheet.values.value(column: 3, row: rowToCheck);
-      newAnimalToList.arksNo =
-          await animalListSheet.values.value(column: 4, row: rowToCheck);
-      //animalListToReturn.add(newAnimalToList);
+      
       animalListToReturn.add(newAnimalToList);
     }
 
