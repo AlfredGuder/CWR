@@ -91,6 +91,7 @@ class _FecesPageState extends State<FecesPage> {
     //checkFecesList();
   }
 
+  //TODO optimize load time like in home page
   @override
   Widget build(BuildContext context) {
     return Scaffold(

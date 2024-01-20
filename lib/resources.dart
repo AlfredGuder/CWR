@@ -77,17 +77,15 @@ class SheetService {
 
     for (int i = 0; i < listLength; i++) {
       int rowToCheck = 3 + i;
-
-
+      print('fetching animaldata');
       var data = await Future.wait([
-                    animalListSheet.values.value(column: 1, row: rowToCheck), //Name
-                    animalListSheet.values.value(column: 2, row: rowToCheck), //arks
-                    animalListSheet.values.value(column: 3, row: rowToCheck), //sex
-                    animalListSheet.values.value(column: 4, row: rowToCheck),] //species
-                    );
+        animalListSheet.values.value(column: 1, row: rowToCheck), //Name
+        animalListSheet.values.value(column: 4, row: rowToCheck), //arks
+        animalListSheet.values.value(column: 3, row: rowToCheck), //sex
+        animalListSheet.values.value(column: 2, row: rowToCheck),
+      ] //species
+          );
 
-
-      
       Animal newAnimalToList = Animal(
         animalName: data[0],
         arksNo: data[1],
@@ -97,7 +95,7 @@ class SheetService {
         midFeed: 0,
         pmFeed: 0,
       );
-      
+      print('fetched animaldata');
       animalListToReturn.add(newAnimalToList);
     }
 

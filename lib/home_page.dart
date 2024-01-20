@@ -156,7 +156,7 @@ class MyHomePageState extends State<MyHomePage> {
                 initialData: false,
                 future: isDataLoading
                     ? null
-                    : getFeedingDataByDate(selectedDate, animalNames),
+                    : getFeedingDataByDate(selectedDate, animalFeedList),
                 builder: (context, snapshot) {
                   if (isDataLoading == true) {
                     return SingleChildScrollView(
@@ -189,7 +189,7 @@ class MyHomePageState extends State<MyHomePage> {
                             ],
                           ),
                           AnimalCard(animalFeedList),
-                          Row(
+                          Column(
                             children: [
                               FloatingActionButton(
                                 heroTag: 'animalFeedButton',
@@ -216,30 +216,6 @@ class MyHomePageState extends State<MyHomePage> {
                                 },
                                 child: const Text("Save"),
                               ),
-                              FloatingActionButton(
-                                heroTag: 'feedlistbuilder',
-                                onPressed: () async {
-                                  bool testresults =
-                                      await animalFeedListGenerator();
-                                  print(animalFeedList);
-                                },
-                                child: const Text("Tester"),
-                              ),
-
-                              // FloatingActionButton(
-                              //   onPressed: () {
-                              //     sheetLoadoutInit(selectedDate, animalFeedList, );
-                              //     Navigator.push(context,
-                              //         MaterialPageRoute(builder: (context) {
-                              //       return Comment_Page(
-                              //         animalNameList: animalNames,
-                              //         currentDate: selectedDate,
-                              //       );
-                              //     }));
-                              //   },
-                              //   heroTag: 'btn5',
-                              //   child: const Text('C'),
-                              // ),
                               FloatingActionButton(
                                 heroTag: 'btn3',
                                 onPressed: () {
@@ -419,22 +395,27 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   Future<bool>? getFeedingDataByDate(
-      DateTime receivedDate, List<String> animalnameList) async {
+      DateTime receivedDate, List<Animal> animalList) async {
     final currentWorkSheet =
         await SheetService.checkSheetforDate(receivedDate, animalFeedList);
-    for (int i = 0; i < animalnameList.length; i++) {
-      String currentAnimal = animalnameList[i];
-      int currentAnimalStartingRow =
-          await currentWorkSheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+
+    await Future.wait(animalList.map((currentAnimal) async {
+      print('fetching data for ${currentAnimal.animalName}');
+      int currentAnimalStartingRow = await currentWorkSheet.values
+          .rowIndexOf(currentAnimal.animalName, inColumn: 6);
       int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
 
-      animalFeedList[i].amFeed = int.parse(
-          await currentWorkSheet.values.value(column: 3, row: amFeedRow));
-      animalFeedList[i].midFeed = int.parse(
-          await currentWorkSheet.values.value(column: 3, row: amFeedRow + 1));
-      animalFeedList[i].pmFeed = int.parse(
-          await currentWorkSheet.values.value(column: 3, row: amFeedRow + 2));
-    }
+      var feedData = await Future.wait([
+        currentWorkSheet.values.value(column: 3, row: amFeedRow), //AM
+        currentWorkSheet.values.value(column: 3, row: amFeedRow + 1), //MID
+        currentWorkSheet.values.value(column: 3, row: amFeedRow + 2), //PM
+      ]);
+      print('feched data for ${currentAnimal.animalName}');
+      currentAnimal.amFeed = int.parse(feedData[0]);
+      currentAnimal.midFeed = int.parse(feedData[1]);
+      currentAnimal.pmFeed = int.parse(feedData[2]);
+    }));
+
     setState(() {
       isDataLoading = true;
     });

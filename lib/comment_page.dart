@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
 import 'resources.dart';
 
+//TODO optimize load time like in home page
 class Comment_Page extends StatefulWidget {
   final List<String> animalNameList;
 
