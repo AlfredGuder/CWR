@@ -38,76 +38,26 @@ class _MyWidgetState extends State<AnimalCard> {
           shrinkWrap: true,
           itemCount: animals.length,
           itemBuilder: (BuildContext context, int index) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(animals[index].animalName),
-                Text("AM:${animals[index].amFeed}"),
-                Text("MID:${animals[index].midFeed}"),
-                Text("PM:${animals[index].pmFeed}"),
-              ],
-            );
+            return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(animals[index].animalName),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text('AM: ${animals[index].amFeed}'),
+                        Text('MID: ${animals[index].midFeed}'),
+                        Text('PM: ${animals[index].pmFeed}'),
+                      ],
+                    )
+                  ],
+                ));
           }),
     );
-
-    /*
-    Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            animalFeedList[animalNumber].animalName,
-          ),
-          Text("AM:${animalFeedList[animalNumber].amFeed.toString()}"),
-          Text("MID:${animalFeedList[animalNumber].midFeed.toString()}"),
-          Text("PM:${animalFeedList[animalNumber].pmFeed.toString()}"),
-          FloatingActionButton(
-            onPressed: () async {
-              final feedAmount = await _dialogBuilder();
-              //if (feedAmount == null || feedAmount.isEmpty) return;
-              await feedPicker();
-              setState(() {
-                if (feedChoice == "AM") {
-                  this.animalFeedList[animalNumber].amFeed = feedAmount as int;
-                } else if (feedChoice == "MID") {
-                  this.animalFeedList[animalNumber].midFeed = feedAmount as int;
-                } else if (feedChoice == "PM") {
-                  this.animalFeedList[animalNumber].pmFeed = feedAmount as int;
-                } else if (feedChoice == "cancel") {
-                  return;
-                }
-              });
-              print(animalFeedList[animalNumber].amFeed);
-            },
-            child: const Text("Add"),
-          )
-        ],
-      ),
-    );
-
-  */
   }
-
-  // Future<int?> _dialogBuilder() => showDialog<int>(
-  //       context: context,
-  //       builder: (context) => AlertDialog(
-  //         title: const Text("Enter amount:"),
-  //         content: TextField(
-  //           autofocus: true,
-  //           controller: controller,
-  //           keyboardType: TextInputType.number,
-  //           inputFormatters: <TextInputFormatter>[
-  //             FilteringTextInputFormatter.digitsOnly
-  //           ],
-  //         ),
-  //         actions: [
-  //           FloatingActionButton(
-  //             onPressed: submit,
-  //             child: const Text("Submit"),
-  //           )
-  //         ],
-  //       ),
-  //     );
 
   void submit() {
     Navigator.of(context).pop(

@@ -1,11 +1,14 @@
+import 'package:documentation_assistant/sheet_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:documentation_assistant/animal.dart';
 import 'package:flutter/services.dart';
 
 class AnimalAdditionPage extends StatefulWidget {
   final List<Animal> animalDataList;
+  final DateTime currentDateTime;
 
-  const AnimalAdditionPage({Key? key, required this.animalDataList})
+  const AnimalAdditionPage(
+      {Key? key, required this.animalDataList, required this.currentDateTime})
       : super(key: key);
 
   @override
@@ -15,11 +18,13 @@ class AnimalAdditionPage extends StatefulWidget {
 class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
   late List<Animal> currentAnimalList;
   late TextEditingController controller;
+  late DateTime useDate;
 
   @override
   void initState() {
     super.initState();
     currentAnimalList = widget.animalDataList;
+    useDate = widget.currentDateTime;
     controller = TextEditingController();
   }
 
@@ -61,7 +66,9 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                           animalToAdd.sex != '' &&
                           animalToAdd.species != '' &&
                           animalToAdd.arksNo != '') {
-                        () {}; //TODO add animal to GSheets
+                        await addAnimalToFeedSheet(animalToAdd);
+                        await addNewSheetForAnimal(useDate, animalToAdd);
+                        //TODO add animal to GSheets
                         setState(() {
                           currentAnimalList.add(animalToAdd);
                         });

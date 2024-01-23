@@ -39,6 +39,13 @@ class SheetService {
         await createWorksheet(dateByMonthYear);
   }
 
+  static Future<Worksheet?> getWorkSheetByTitle(String title) async {
+    final sheetsClient = GSheets(_credentials);
+    final currentSpreadSheet = await sheetsClient.spreadsheet(_spreadsheetId);
+
+    return currentSpreadSheet.worksheetByTitle(title);
+  }
+
   static Future<Worksheet> checkSheetforDate(
       DateTime targetDate, List<Animal> animalNameList) async {
     final sheetsClient = GSheets(_credentials);

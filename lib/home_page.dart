@@ -164,7 +164,7 @@ class MyHomePageState extends State<MyHomePage> {
                       child: Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(
                                   "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
@@ -187,8 +187,6 @@ class MyHomePageState extends State<MyHomePage> {
                                       isDataLoading = false;
                                     }),
                                   );
-                                  getFeedingDataByDate(
-                                      selectedDate, animalFeedList);
                                 },
                                 child: const Text("C"),
                               ),
@@ -242,6 +240,7 @@ class MyHomePageState extends State<MyHomePage> {
                                       MaterialPageRoute(builder: (context) {
                                     return AnimalAdditionPage(
                                       animalDataList: animalFeedList,
+                                      currentDateTime: selectedDate,
                                     );
                                   }));
                                 },
@@ -414,6 +413,7 @@ class MyHomePageState extends State<MyHomePage> {
 
   Future<bool>? getFeedingDataByDate(
       DateTime receivedDate, List<Animal> animalList) async {
+    print(receivedDate);
     final currentWorkSheet =
         await SheetService.checkSheetforDate(receivedDate, animalFeedList);
 
