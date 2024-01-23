@@ -114,7 +114,7 @@ class _Comment_PageState extends State<Comment_Page> {
       } else {
         List<String> spltCommentStringList = receivedCommentString.split('//');
         for (int j = 0; j < spltCommentStringList.length; j++) {
-          animalCommentMap[currentAnimal]!.add(spltCommentStringList[i]);
+          animalCommentMap[currentAnimal]!.add(spltCommentStringList[j]);
         }
       }
 

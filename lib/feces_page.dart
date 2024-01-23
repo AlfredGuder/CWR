@@ -36,15 +36,8 @@ class _FecesPageState extends State<FecesPage> {
     List<bool> tempCheckList = List.filled(nameList.length, false);
 
     Worksheet currentWorksheet = await SheetService.getWorkSheetByDate(useDate);
-    //String dateToCheck = '${useDate.split('/')[0]}/${useDate.split(' / ')[1]}';
-    //bool animalFecesState = false;
-    for (int i = 0; i < nameList.length; i++) {
-      // String animalToCheck = nameList[i];
-      // int animalToCheckStartRow =
-      //     await currentWorksheet!.values.rowIndexOf(animalToCheck, inColumn: 6);
-      // int rowToCheck =
-      //     animalToCheckStartRow + (3 * int.parse(useDate.split('/')[0])) - 1;
 
+    for (int i = 0; i < nameList.length; i++) {
       String currentAnimal = nameList[i];
       int currentAnimalStartRow =
           await currentWorksheet.values.rowIndexOf(currentAnimal, inColumn: 6);
@@ -58,11 +51,6 @@ class _FecesPageState extends State<FecesPage> {
         tempCheckList[i] = false;
       }
     }
-    // setState(() {
-    //   animalFecesCheckList = tempCheckList;
-
-    // });
-
     setState(() {
       for (int i = 0; i < animalFecesCheckList.length; i++) {
         if (tempCheckList[i] == true) {

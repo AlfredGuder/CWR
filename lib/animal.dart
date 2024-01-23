@@ -8,7 +8,8 @@ class Animal {
   String species;
   String sex;
   String arksNo;
-
+  //TODO add a function to create an animal in gsheets and constuct a sheet for it for this month and year
+  //TODO for a given month and year, parse an animal
   Animal(
       {required this.animalName,
       required this.species,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:documentation_assistant/animal.dart';
+import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:documentation_assistant/comment_page.dart';
 import 'package:documentation_assistant/resources.dart';
@@ -179,17 +180,22 @@ class MyHomePageState extends State<MyHomePage> {
                                   if (newDate == null) return;
 
                                   //getFeedingDataByDate(newDate, animalNames);
-                                  isDataLoading = false;
+
                                   setState(
-                                    (() => selectedDate = newDate),
+                                    (() {
+                                      selectedDate = newDate;
+                                      isDataLoading = false;
+                                    }),
                                   );
+                                  getFeedingDataByDate(
+                                      selectedDate, animalFeedList);
                                 },
                                 child: const Text("C"),
                               ),
                             ],
                           ),
                           AnimalCard(animalFeedList),
-                          Column(
+                          Row(
                             children: [
                               FloatingActionButton(
                                 heroTag: 'animalFeedButton',
@@ -228,6 +234,18 @@ class MyHomePageState extends State<MyHomePage> {
                                   }));
                                 },
                                 child: const Text('F'),
+                              ),
+                              FloatingActionButton(
+                                heroTag: 'btn4',
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                    return AnimalAdditionPage(
+                                      animalDataList: animalFeedList,
+                                    );
+                                  }));
+                                },
+                                child: const Text('New'),
                               ),
                               FloatingActionButton(
                                 onPressed: () {
