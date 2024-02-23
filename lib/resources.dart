@@ -109,6 +109,12 @@ class SheetService {
     return animalListToReturn;
   }
 
+  static Future<void> removeAnimalRow(String animalName) async {
+    Worksheet? animalDataSheet = await getWorkSheetByTitle('AnimalFeedSheet');
+    int removeRow = await animalDataSheet!.values.rowIndexOf(animalName);
+    animalDataSheet.deleteRow(removeRow);
+  }
+
   static Future<Spreadsheet?> getGlobalSpreadSheet() async {
     final sheetsClient = GSheets(_credentials);
     return await sheetsClient.spreadsheet(_spreadsheetId);

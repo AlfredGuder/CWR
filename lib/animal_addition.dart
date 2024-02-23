@@ -1,3 +1,4 @@
+import 'package:documentation_assistant/resources.dart';
 import 'package:documentation_assistant/sheet_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:documentation_assistant/animal.dart';
@@ -41,18 +42,23 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                 shrinkWrap: true,
                 itemCount: currentAnimalList.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(currentAnimalList[index].animalName),
-                          Text(currentAnimalList[index].species),
-                          Text(currentAnimalList[index].sex),
-                          Text(currentAnimalList[index].arksNo),
-                        ],
-                      )
-                    ],
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(currentAnimalList[index].animalName),
+                            Text(currentAnimalList[index].species),
+                            Text(currentAnimalList[index].sex),
+                            Text(currentAnimalList[index].arksNo),
+                          ],
+                        )
+                      ],
+                    ),
                   );
                 }),
             Row(
@@ -68,7 +74,6 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                           animalToAdd.arksNo != '') {
                         await addAnimalToFeedSheet(animalToAdd);
                         await addNewSheetForAnimal(useDate, animalToAdd);
-                        //TODO add animal to GSheets
                         setState(() {
                           currentAnimalList.add(animalToAdd);
                         });
@@ -77,7 +82,17 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                     child: const Text('Add')),
                 FloatingActionButton(
                   heroTag: 'removeButton',
-                  onPressed: () {},
+                  onPressed: () async {
+                    Animal? animalToRemove =
+                        await nameRemovalScreen(currentAnimalList);
+                    if (animalToRemove != null) {
+                      await SheetService.removeAnimalRow(
+                          animalToRemove.animalName);
+                      setState(() {
+                        currentAnimalList.remove(animalToRemove);
+                      });
+                    }
+                  },
                   child: const Text('Remove'),
                 ),
               ],
@@ -87,6 +102,31 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
       ),
     );
   }
+
+  Future<Animal?> nameRemovalScreen(List<Animal> localAnimalList) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Text('Pick an animal to remove'),
+            content: SizedBox(
+              height: 200,
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: localAnimalList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Column(
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(localAnimalList[index]);
+                          },
+                          child: Text(localAnimalList[index].animalName))
+                    ],
+                  );
+                },
+              ),
+            ),
+          ));
 
   Future<Animal?> addAnimal() async {
     Animal newAnimal = Animal(
@@ -100,6 +140,7 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
     );
     newAnimal.animalName = await nameAdditionScreen() ?? '';
     controller.clear();
+
     newAnimal.species = await speciesAdditionScreen() ?? '';
     newAnimal.sex = await sexAdditionScreen() ?? '';
     newAnimal.arksNo = await arksAdditionScreen() ?? '';

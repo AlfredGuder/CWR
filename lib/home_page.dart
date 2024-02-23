@@ -31,57 +31,6 @@ class MyHomePageState extends State<MyHomePage> {
   bool isFeedListBuilt = false;
 
   List<Animal> animalFeedList = [];
-//
-  // List<Animal> animalFeedList = [
-  //   Animal(
-  //       animalName: "Thane",
-  //       amFeed: 0,
-  //       midFeed: 0,
-  //       pmFeed: 0,
-  //       species: 'cheetah',
-  //       sex: 'male',
-  //       arksNo: '1'),
-  //   Animal(
-  //       animalName: "Valora",
-  //       amFeed: 0,
-  //       midFeed: 0,
-  //       pmFeed: 0,
-  //       species: 'cheetah',
-  //       sex: 'female',
-  //       arksNo: '2'),
-  //   Animal(
-  //       animalName: "T'Challa",
-  //       amFeed: 0,
-  //       midFeed: 0,
-  //       pmFeed: 0,
-  //       species: 'cheetah',
-  //       sex: 'male',
-  //       arksNo: '3'),
-  //   Animal(
-  //       animalName: "Xena",
-  //       amFeed: 0,
-  //       midFeed: 0,
-  //       pmFeed: 0,
-  //       species: 'cheetah',
-  //       sex: 'female',
-  //       arksNo: '4'),
-  //   Animal(
-  //       animalName: "Xion",
-  //       amFeed: 0,
-  //       midFeed: 0,
-  //       pmFeed: 0,
-  //       species: 'cheetah',
-  //       sex: 'male',
-  //       arksNo: '5'),
-  //   Animal(
-  //       animalName: "Xavier",
-  //       amFeed: 0,
-  //       midFeed: 0,
-  //       pmFeed: 0,
-  //       species: 'cheetah',
-  //       sex: 'male',
-  //       arksNo: '6'),
-  // ];
 
   Future<bool> animalFeedListGenerator() async {
     animalFeedList = await SheetService.animalFeedListBuilder();
@@ -97,40 +46,11 @@ class MyHomePageState extends State<MyHomePage> {
 
   void dateEditingCheck(DateTime checkDate, {bool displaySnackBar = true}) {
     String useDate = extractDate(checkDate);
-
-    // Map<String, Animal> feedData = readAnimalsFromDate(checkDate);
-    // if (displaySnackBar) {
-    //   if (feedData.isEmpty) {
-    //     showSnackBar("No data saved for $useDate");
-    //   } else {
-    //     showSnackBar("Read data for ${feedData.length} animals");
-    //   }
-    // }
-    // for (Animal animal in animalFeedList) {
-    //   String currentAnimalName = animal.animalName;
-    //   Animal newAnimalData = feedData[currentAnimalName] ??
-    //       Animal.defaultAnimal(currentAnimalName);
-
-    //   animal.amFeed = newAnimalData.amFeed;
-    //   animal.midFeed = newAnimalData.midFeed;
-    //   animal.pmFeed = newAnimalData.pmFeed;
-    // }
   }
 
   @override
   void initState() {
     super.initState();
-    //animalNames = extractAnimalNames(animalFeedList);
-
-    //sheetLoadoutInit(selectedDate, animalFeedList);
-
-    //SheetService.checkSheetforDate(selectedDate, animalFeedList);
-    // getFeedingDataByDate(
-    //   selectedDate,
-    //   animalNames,
-    // );
-    //dateEditingCheck(selectedDate, displaySnackBar: false);
-
     controller = TextEditingController();
   }
 
@@ -146,6 +66,68 @@ class MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Animals"),
+        actions: [
+          PopupMenuButton<String>(onSelected: (value) {
+            print('Selected $value');
+            if (value == 'Comment') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return Comment_Page(
+                      animalNameList: animalNames, currentDate: selectedDate);
+                }),
+              );
+            }
+            if (value == 'Animals') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return AnimalAdditionPage(
+                      animalDataList: animalFeedList,
+                      currentDateTime: selectedDate);
+                }),
+              );
+            }
+            if (value == 'Feces') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return FecesPage(
+                    animalNames: animalNames, currentDate: selectedDate);
+              }));
+            }
+          }, itemBuilder: (BuildContext context) {
+            return [
+              const PopupMenuItem(
+                value: 'Comment',
+                child: Row(
+                  children: [
+                    Icon(Icons.comment),
+                    SizedBox(width: 8),
+                    Text('Comment'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'Animals',
+                child: Row(
+                  children: [
+                    Icon(Icons.add),
+                    SizedBox(width: 8),
+                    Text('Animals')
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                  value: 'Feces',
+                  child: Row(
+                    children: [
+                      Icon(Icons.whatshot),
+                      SizedBox(width: 8),
+                      Text('Feces'),
+                    ],
+                  ))
+            ];
+          }),
+        ],
       ),
       body: FutureBuilder<bool>(
         initialData: false,
@@ -194,6 +176,7 @@ class MyHomePageState extends State<MyHomePage> {
                           ),
                           AnimalCard(animalFeedList),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               FloatingActionButton(
                                 heroTag: 'animalFeedButton',
@@ -220,45 +203,6 @@ class MyHomePageState extends State<MyHomePage> {
                                 },
                                 child: const Text("Save"),
                               ),
-                              FloatingActionButton(
-                                heroTag: 'btn3',
-                                onPressed: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) {
-                                    return FecesPage(
-                                      animalNames: animalNames,
-                                      currentDate: selectedDate,
-                                    );
-                                  }));
-                                },
-                                child: const Text('F'),
-                              ),
-                              FloatingActionButton(
-                                heroTag: 'btn4',
-                                onPressed: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) {
-                                    return AnimalAdditionPage(
-                                      animalDataList: animalFeedList,
-                                      currentDateTime: selectedDate,
-                                    );
-                                  }));
-                                },
-                                child: const Text('New'),
-                              ),
-                              FloatingActionButton(
-                                onPressed: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) {
-                                    return Comment_Page(
-                                      animalNameList: animalNames,
-                                      currentDate: selectedDate,
-                                    );
-                                  }));
-                                },
-                                heroTag: 'commentbtn',
-                                child: const Text('Co'),
-                              )
                             ],
                           )
                         ],
