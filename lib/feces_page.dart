@@ -29,6 +29,12 @@ class _FecesPageState extends State<FecesPage> {
   bool isDataLoading = false;
 
   Future<bool>? checkFecesList() async {
+    Map<String, String> fecesStateMap = {};
+
+    for (int i = 0; i < nameList.length; i++) {
+      fecesStateMap.putIfAbsent(nameList[i], () => 'No');
+    }
+
     // setState(() {
     //   isDataLoading = true;
     // });
@@ -84,6 +90,8 @@ class _FecesPageState extends State<FecesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: const Color(0xFFF27127),
+          foregroundColor: const Color(0xFF000000),
           title: const Text("Feces"),
         ),
         body: Center(
@@ -96,7 +104,10 @@ class _FecesPageState extends State<FecesPage> {
                 //int data = snapshot.data!;
                 return Column(
                   children: [
-                    ElevatedButton(
+                    FloatingActionButton(
+                      heroTag: 'returnButton',
+                      backgroundColor: const Color(0xFFF27127),
+                      foregroundColor: const Color(0xFF000000),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -111,6 +122,8 @@ class _FecesPageState extends State<FecesPage> {
                             children: [
                               Text(nameList[index]),
                               FloatingActionButton(
+                                backgroundColor: const Color(0xFFF27127),
+                                foregroundColor: const Color(0xFF000000),
                                 heroTag: 'fecesCheckButton$index',
                                 onPressed: () => updateFecesList(index),
                                 child: Text(animalFecesButtonState[index]),
@@ -118,7 +131,10 @@ class _FecesPageState extends State<FecesPage> {
                             ],
                           );
                         }),
-                    ElevatedButton(
+                    FloatingActionButton(
+                      heroTag: 'saveButton',
+                      backgroundColor: const Color(0xFFF27127),
+                      foregroundColor: const Color(0xFF000000),
                       onPressed: () => saveToSheet(useDate),
                       child: const Text('sheet'),
                     )

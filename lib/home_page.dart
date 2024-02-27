@@ -20,7 +20,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  final _myBox = Hive.box("animalFeedBox");
   late TextEditingController controller;
   String feedChoice = "MID";
   String animalChoice = "Willa";
@@ -65,6 +64,8 @@ class MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFFF27127),
+        foregroundColor: const Color(0xFF000000),
         title: const Text("Animals"),
         actions: [
           PopupMenuButton<String>(onSelected: (value) {
@@ -150,7 +151,9 @@ class MyHomePageState extends State<MyHomePage> {
                             children: [
                               Text(
                                   "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
-                              ElevatedButton(
+                              FloatingActionButton(
+                                backgroundColor: const Color(0xFFF27127),
+                                foregroundColor: const Color(0xFF000000),
                                 onPressed: () async {
                                   DateTime? newDate = await showDatePicker(
                                     context: context,
@@ -179,6 +182,8 @@ class MyHomePageState extends State<MyHomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               FloatingActionButton(
+                                backgroundColor: const Color(0xFFF28322),
+                                foregroundColor: const Color(0xFF000000),
                                 heroTag: 'animalFeedButton',
                                 onPressed: () async {
                                   Animal? animalToUpdate = await animalPicker();
@@ -197,6 +202,8 @@ class MyHomePageState extends State<MyHomePage> {
                                 child: const Text("Add"),
                               ),
                               FloatingActionButton(
+                                backgroundColor: const Color(0xFFF28322),
+                                foregroundColor: const Color(0xFF000000),
                                 heroTag: 'saveButton',
                                 onPressed: () {
                                   saveData(selectedDate, animalNames);
@@ -227,7 +234,11 @@ class MyHomePageState extends State<MyHomePage> {
   Future<Animal?> animalPicker() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Pick Animal:"),
+          backgroundColor: const Color(0xFF000000),
+          title: const Text(
+            "Pick Animal:",
+            style: TextStyle(color: Colors.white),
+          ),
           content: SizedBox(
             height: 200,
             width: double.maxFinite,
@@ -237,7 +248,9 @@ class MyHomePageState extends State<MyHomePage> {
                 itemBuilder: (BuildContext context, int index) {
                   return Column(
                     children: [
-                      ElevatedButton(
+                      FloatingActionButton(
+                        backgroundColor: const Color(0xFFF28322),
+                        foregroundColor: const Color(0xFF000000),
                         onPressed: () async {
                           Animal animal = animalFeedList[index];
                           String animalName = animal.animalName;
@@ -272,9 +285,13 @@ class MyHomePageState extends State<MyHomePage> {
   Future feedTimePicker(int animalChoice) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF000000),
+            titleTextStyle: const TextStyle(color: Colors.white),
             title: const Text("Choose feed time:"),
             actions: ["AM", "MID", "PM"]
-                .map((time) => ElevatedButton(
+                .map((time) => FloatingActionButton(
+                    foregroundColor: const Color(0xFF000000),
+                    backgroundColor: const Color(0xFFF28322),
                     onPressed: () async {
                       String amount = await feedAmountPicker() ?? "";
                       if (mounted) {
@@ -290,6 +307,8 @@ class MyHomePageState extends State<MyHomePage> {
   Future<String?> feedAmountPicker() => showDialog<String?>(
         context: context,
         builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF000000),
+          titleTextStyle: const TextStyle(color: Colors.white),
           title: const Text("Enter Amount:"),
           content: TextField(
             autofocus: true,
@@ -301,6 +320,8 @@ class MyHomePageState extends State<MyHomePage> {
           ),
           actions: [
             FloatingActionButton(
+              backgroundColor: const Color(0xFFF28322),
+              foregroundColor: const Color(0xFF000000),
               heroTag: 'submitbutton',
               onPressed: submitFeedAmount,
               child: const Text("Submit"),
