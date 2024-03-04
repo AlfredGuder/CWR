@@ -374,7 +374,7 @@ class MyHomePageState extends State<MyHomePage> {
         await SheetService.checkSheetforDate(receivedDate, animalFeedList);
 
     await Future.wait(animalList.map((currentAnimal) async {
-      print('fetching data for ${currentAnimal.animalName}');
+      print('Fetching data for ${currentAnimal.animalName}');
       int currentAnimalStartingRow = await currentWorkSheet.values
           .rowIndexOf(currentAnimal.animalName, inColumn: 6);
       int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
@@ -384,7 +384,7 @@ class MyHomePageState extends State<MyHomePage> {
         currentWorkSheet.values.value(column: 3, row: amFeedRow + 1), //MID
         currentWorkSheet.values.value(column: 3, row: amFeedRow + 2), //PM
       ]);
-      print('feched data for ${currentAnimal.animalName}');
+      print('Fetched data for ${currentAnimal.animalName}');
       currentAnimal.amFeed = int.parse(feedData[0]);
       currentAnimal.midFeed = int.parse(feedData[1]);
       currentAnimal.pmFeed = int.parse(feedData[2]);

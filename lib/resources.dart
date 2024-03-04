@@ -75,7 +75,7 @@ static void setCredentials(String creds) {
 
     for (int i = 0; i < listLength; i++) {
       int rowToCheck = 3 + i;
-      print('fetching animaldata');
+      print('Fetching animaldata');
       var data = await Future.wait([
         animalListSheet.values.value(column: 1, row: rowToCheck), //Name
         animalListSheet.values.value(column: 4, row: rowToCheck), //arks
@@ -93,7 +93,7 @@ static void setCredentials(String creds) {
         midFeed: 0,
         pmFeed: 0,
       );
-      print('fetched animaldata');
+      print('Fetched animaldata');
       animalListToReturn.add(newAnimalToList);
     }
 
