@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:documentation_assistant/home_page.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +14,8 @@ bool populateDummyData = true;
 //
 void main() async {
   await dotenv.load();
-  print(".env loaded: ${dotenv.env}");
-  final parsedCreds = jsonDecode(dotenv.env["G_SHEETS_CREDS"]!);
-  print("Parsed creds: $parsedCreds");
   SheetService.setCredentials(dotenv.env["G_SHEETS_CREDS"]!);
-  
+
   runApp(const MyApp());
 }
 
