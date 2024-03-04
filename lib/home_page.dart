@@ -3,7 +3,6 @@ import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:documentation_assistant/comment_page.dart';
 import 'package:documentation_assistant/resources.dart';
-import 'package:documentation_assistant/sheet_builder.dart';
 import 'package:documentation_assistant/feces_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,10 +40,6 @@ class MyHomePageState extends State<MyHomePage> {
     return Resources.hiveDataFormat.format(receivedDate);
   }
 
-  void dateEditingCheck(DateTime checkDate, {bool displaySnackBar = true}) {
-    String useDate = extractDate(checkDate);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -72,7 +67,7 @@ class MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return Comment_Page(
+                  return CommentPage(
                       animalNameList: animalNames, currentDate: selectedDate);
                 }),
               );
@@ -218,7 +213,7 @@ class MyHomePageState extends State<MyHomePage> {
                   }
                 });
           } else {
-            return const Text("Fethcing list of animals...");
+            return const Text("Fetching list of animals...");
           }
         }),
       ),

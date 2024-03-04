@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
             bodyMedium: TextStyle(color: Colors.white),
           )),
       title: "Documentation Assistant",
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
