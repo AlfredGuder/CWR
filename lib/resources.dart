@@ -21,6 +21,16 @@ static void setCredentials(String creds) {
 //spreadsheet id
   static const _spreadsheetId = '1KC65Z6baN0ayLJmWN1npzzDXt6Lrdvsi0M4Z4FPdP3Y';
 
+  static Future<String> getSpreadsheetID() async {
+    return _spreadsheetId;
+  }
+
+  static Future<Spreadsheet> getSpreadsheet() async {
+    final sheetsClient = GSheets(_credentials);
+    final currentSpreadSheet = await sheetsClient.spreadsheet(_spreadsheetId);
+    return currentSpreadSheet;
+  }
+
   static Future<Worksheet> getWorkSheetByDate(DateTime targetDate) async {
     final sheetsClient = GSheets(_credentials);
     final currentSpreadSheet = await sheetsClient.spreadsheet(_spreadsheetId);

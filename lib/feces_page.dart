@@ -39,32 +39,23 @@ class _FecesPageState extends State<FecesPage> {
     //   isDataLoading = true;
     // });
 
-    List<bool> tempCheckList = List.filled(nameList.length, false);
-
     Worksheet currentWorksheet = await SheetService.getWorkSheetByDate(useDate);
-
-    for (int i = 0; i < nameList.length; i++) {
-      String currentAnimal = nameList[i];
+    List<bool> tempCheckList =
+        await Future.wait(nameList.map((animalName) async {
+      print('fetching data for $animalName');
       int currentAnimalStartRow =
-          await currentWorksheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+          await currentWorksheet.values.rowIndexOf(animalName, inColumn: 6);
       int rowToCheck = currentAnimalStartRow + (3 * useDate.day) - 1;
 
-      String receivedValue =
+      var fecesData =
           await currentWorksheet.values.value(column: 4, row: rowToCheck);
-      if (receivedValue == 'Yes') {
-        tempCheckList[i] = true;
-      } else if (receivedValue == 'No') {
-        tempCheckList[i] = false;
-      }
-    }
+
+      return fecesData == 'Yes';
+    }));
+
     setState(() {
-      for (int i = 0; i < animalFecesCheckList.length; i++) {
-        if (tempCheckList[i] == true) {
-          animalFecesButtonState[i] = 'Yes';
-        } else if (tempCheckList[i] == false) {
-          animalFecesButtonState[i] = 'No';
-        }
-      }
+      animalFecesButtonState =
+          tempCheckList.map((hasFeces) => hasFeces ? 'Yes' : 'No').toList();
 
       isDataLoading = true;
     });
@@ -91,7 +82,7 @@ class _FecesPageState extends State<FecesPage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFFF27127),
-          foregroundColor: const Color(0xFF000000),
+          foregroundColor: (Colors.black),
           title: const Text("Feces"),
         ),
         body: Center(
@@ -107,7 +98,7 @@ class _FecesPageState extends State<FecesPage> {
                     FloatingActionButton(
                       heroTag: 'returnButton',
                       backgroundColor: const Color(0xFFF27127),
-                      foregroundColor: const Color(0xFF000000),
+                      foregroundColor: (Colors.black),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -123,7 +114,7 @@ class _FecesPageState extends State<FecesPage> {
                               Text(nameList[index]),
                               FloatingActionButton(
                                 backgroundColor: const Color(0xFFF27127),
-                                foregroundColor: const Color(0xFF000000),
+                                foregroundColor: (Colors.black),
                                 heroTag: 'fecesCheckButton$index',
                                 onPressed: () => updateFecesList(index),
                                 child: Text(animalFecesButtonState[index]),
@@ -134,7 +125,7 @@ class _FecesPageState extends State<FecesPage> {
                     FloatingActionButton(
                       heroTag: 'saveButton',
                       backgroundColor: const Color(0xFFF27127),
-                      foregroundColor: const Color(0xFF000000),
+                      foregroundColor: (Colors.black),
                       onPressed: () => saveToSheet(useDate),
                       child: const Text('sheet'),
                     )
