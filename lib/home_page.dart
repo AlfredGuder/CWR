@@ -1,74 +1,38 @@
 import 'package:documentation_assistant/animal.dart';
+import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
-import 'package:documentation_assistant/feces_page.dart';
+import 'package:documentation_assistant/comment_page.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:documentation_assistant/sheet_builder.dart';
+import 'package:documentation_assistant/feces_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:hive/hive.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.sheetCredentials, required this.sheetId})
-      : super(key: key);
-  final String sheetCredentials;
-  final String sheetId;
-  //const MyHomePage({super.key});
-  //Feces_Page({Key? key, required this.animalNames}) : super(key: key);
-  //List<String> animalNames;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => MyHomePageState();
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  late String _credentials;
-  late String _sheetId;
   late TextEditingController controller;
   String feedChoice = "MID";
   String animalChoice = "Willa";
   DateTime selectedDate = DateTime.now();
   int firstDay = 0;
 
-  List<Animal> animalFeedList = [
-    Animal(
-        name: "Willa",
-        species: 'Cheetah',
-        sex: 'F',
-        arksNo: '1',
-        gatherData: {}),
-    Animal(
-        name: "Valora",
-        species: 'Cheetah',
-        sex: 'F',
-        arksNo: '2',
-        gatherData: {}),
-    Animal(
-        name: "Xayla",
-        species: 'Cheetah',
-        sex: 'F',
-        arksNo: '3',
-        gatherData: {}),
-    Animal(
-        name: "Cho gath",
-        species: 'Cheetah',
-        sex: 'M',
-        arksNo: '4',
-        gatherData: {})
-  ];
+  bool isDataLoading = false;
+  bool isFeedListBuilt = false;
 
-  List<String> animalNames = [];
+  List<Animal> animalFeedList = [];
 
-  void animalnamegenerator() {
-    for (int i = 0; i < animalFeedList.length; i++) {
-      if (animalNames.length < animalFeedList.length) {
-        animalNames.add("tempanimal");
-      }
-
-      //Animal animal in animalFeedList
-      //animalNames.add(animal.animalName);
-      animalNames[i] = animalFeedList[i].name;
-    }
+  Future<bool> animalFeedListGenerator() async {
+    animalFeedList = await SheetService.animalFeedListBuilder();
+    isFeedListBuilt = true;
+    return true;
   }
 
   String extractDate(DateTime receivedDate) {
@@ -77,30 +41,13 @@ class MyHomePageState extends State<MyHomePage> {
     return Resources.hiveDataFormat.format(receivedDate);
   }
 
-  void getDataForDate(DateTime checkDate, {bool displaySnackBar = true}) {
+  void dateEditingCheck(DateTime checkDate, {bool displaySnackBar = true}) {
     String useDate = extractDate(checkDate);
-    for (int i = 0; i < animalFeedList.length; i++) {
-      if (!animalFeedList[i].hasGatherDataForDate(useDate)) {
-        animalFeedList[i].createNewDateRecording(useDate);
-      }
-    }
-
-    // Map<String, Animal> feedData = readAnimalsFromDate(checkDate);
-    // if (displaySnackBar) {
-    //   if (feedData.isEmpty) {
-    //     showSnackBar("No data saved for $useDate");
-    //   } else {
-    //     showSnackBar("Read data for ${feedData.length} animals");
-    //   }
-    // }
   }
 
   @override
   void initState() {
     super.initState();
-    _credentials = widget.sheetCredentials;
-    _sheetId = widget.sheetId;
-    getDataForDate(selectedDate, displaySnackBar: false);
     controller = TextEditingController();
   }
 
@@ -115,98 +62,183 @@ class MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFFF27127),
+        foregroundColor: const Color(0xFF000000),
         title: const Text("Animals"),
-      ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                  "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
-              ElevatedButton(
-                onPressed: () async {
-                  DateTime? newDate = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(2023, 5),
-                    lastDate: DateTime(2023, 7),
-                  );
-
-                  if (newDate == null) return;
-                  getDataForDate(newDate);
-                  setState(
-                    (() => selectedDate = newDate),
-                  );
-                },
-                child: const Text("C"),
+        actions: [
+          PopupMenuButton<String>(onSelected: (value) {
+            print('Selected $value');
+            if (value == 'Comment') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return Comment_Page(
+                      animalNameList: animalNames, currentDate: selectedDate);
+                }),
+              );
+            }
+            if (value == 'Animals') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return AnimalAdditionPage(
+                      animalDataList: animalFeedList,
+                      currentDateTime: selectedDate);
+                }),
+              );
+            }
+            if (value == 'Feces') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return FecesPage(
+                    animalNames: animalNames, currentDate: selectedDate);
+              }));
+            }
+          }, itemBuilder: (BuildContext context) {
+            return [
+              const PopupMenuItem(
+                value: 'Comment',
+                child: Row(
+                  children: [
+                    Icon(Icons.comment),
+                    SizedBox(width: 8),
+                    Text('Comment'),
+                  ],
+                ),
               ),
-            ],
-          ),
-          AnimalCard(animalFeedList, selectedDate),
-          Row(
-            children: [
-              FloatingActionButton(
-                onPressed: () async {
-                  Animal? animalToUpdate = await animalPicker(selectedDate);
-                  if (animalToUpdate != null) {
-                    int animalIndex = animalFeedList.indexWhere(
-                        (Animal animal) => animal.name == animalToUpdate.name);
-                    setState(() {
-                      animalFeedList[animalIndex] = animalToUpdate;
-                    });
-                    controller.clear();
-                  }
-                },
-                child: const Text("Add"),
+              const PopupMenuItem(
+                value: 'Animals',
+                child: Row(
+                  children: [
+                    Icon(Icons.add),
+                    SizedBox(width: 8),
+                    Text('Animals')
+                  ],
+                ),
               ),
-              FloatingActionButton(
-                heroTag: 'btn1',
-                onPressed: () {}, //saveData,
-                child: const Text("Save"),
-              ),
-              FloatingActionButton(
-                heroTag: 'btn2',
-                onPressed: saveSheet(selectedDate),
-                child: const Text('sheet'),
-              ),
-              FloatingActionButton(
-                heroTag: 'btn3',
-                onPressed: () {
-                  animalnamegenerator();
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FecesPage(
-                      animalNames: animalNames,
-                      sheetCredentials: _credentials,
-                      sheetId: _sheetId,
-                      currentDate:
-                          "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-                    );
-                  }));
-                },
-                child: const Text('F'),
-              ),
-              FloatingActionButton(
-                onPressed: () {
-                  sheetChecker(_credentials, _sheetId, selectedDate.month,
-                      selectedDate.year, animalFeedList);
-                },
-                heroTag: 'btn4',
-                child: const Text('C'),
-              )
-            ],
-          )
+              const PopupMenuItem(
+                  value: 'Feces',
+                  child: Row(
+                    children: [
+                      Icon(Icons.whatshot),
+                      SizedBox(width: 8),
+                      Text('Feces'),
+                    ],
+                  ))
+            ];
+          }),
         ],
+      ),
+      body: FutureBuilder<bool>(
+        initialData: false,
+        future: isFeedListBuilt ? null : animalFeedListGenerator(),
+        builder: ((context, snapshot) {
+          if (isFeedListBuilt == true) {
+            animalNames = extractAnimalNames(animalFeedList);
+            return FutureBuilder(
+                initialData: false,
+                future: isDataLoading
+                    ? null
+                    : getFeedingDataByDate(selectedDate, animalFeedList),
+                builder: (context, snapshot) {
+                  if (isDataLoading == true) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                  "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
+                              FloatingActionButton(
+                                backgroundColor: const Color(0xFFF27127),
+                                foregroundColor: const Color(0xFF000000),
+                                onPressed: () async {
+                                  DateTime? newDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: selectedDate,
+                                    firstDate: DateTime(2023),
+                                    lastDate: DateTime(2024, 12),
+                                  );
+
+                                  if (newDate == null) return;
+
+                                  //getFeedingDataByDate(newDate, animalNames);
+
+                                  setState(
+                                    (() {
+                                      selectedDate = newDate;
+                                      isDataLoading = false;
+                                    }),
+                                  );
+                                },
+                                child: const Text("C"),
+                              ),
+                            ],
+                          ),
+                          AnimalCard(animalFeedList),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              FloatingActionButton(
+                                backgroundColor: const Color(0xFFF28322),
+                                foregroundColor: const Color(0xFF000000),
+                                heroTag: 'animalFeedButton',
+                                onPressed: () async {
+                                  Animal? animalToUpdate = await animalPicker();
+                                  if (animalToUpdate != null) {
+                                    int animalIndex = animalFeedList.indexWhere(
+                                        (Animal animal) =>
+                                            animal.animalName ==
+                                            animalToUpdate.animalName);
+                                    setState(() {
+                                      animalFeedList[animalIndex] =
+                                          animalToUpdate;
+                                    });
+                                    controller.clear();
+                                  }
+                                },
+                                child: const Text("Add"),
+                              ),
+                              FloatingActionButton(
+                                backgroundColor: const Color(0xFFF28322),
+                                foregroundColor: const Color(0xFF000000),
+                                heroTag: 'saveButton',
+                                onPressed: () {
+                                  saveData(selectedDate, animalNames);
+                                },
+                                child: const Text("Save"),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Text('fetching feeding data');
+                  }
+                });
+          } else {
+            return const Text("Fethcing list of animals...");
+          }
+        }),
       ),
     );
   }
 
-  Future<Animal?> animalPicker(DateTime updateDate) => showDialog(
+  List<String> animalNames = [];
+  List<String> extractAnimalNames(List<Animal> animalList) =>
+      animalList.map((animal) => animal.animalName).toList();
+
+  Future<Animal?> animalPicker() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Pick Animal:"),
+          backgroundColor: const Color(0xFF000000),
+          title: const Text(
+            "Pick Animal:",
+            style: TextStyle(color: Colors.white),
+          ),
           content: SizedBox(
-            height: 300,
+            height: 200,
             width: double.maxFinite,
             child: ListView.builder(
                 shrinkWrap: true,
@@ -214,32 +246,32 @@ class MyHomePageState extends State<MyHomePage> {
                 itemBuilder: (BuildContext context, int index) {
                   return Column(
                     children: [
-                      ElevatedButton(
+                      FloatingActionButton(
+                        backgroundColor: const Color(0xFFF28322),
+                        foregroundColor: const Color(0xFF000000),
                         onPressed: () async {
                           Animal animal = animalFeedList[index];
-                          String animalName = animal.name;
+                          String animalName = animal.animalName;
                           //print(animalChoice);
 
                           int animalIndex = animalFeedList.indexWhere(
-                              (Animal animal) => animal.name == animalName);
+                              (Animal animal) =>
+                                  animal.animalName == animalName);
                           //int animalIndex = animalIndexChooser(animalChoice, 0);
                           List<String> data =
                               (await feedTimePicker(animalIndex)).split(",");
                           if (data[1] == "AM") {
-                            animal.setAmFeedForDate(
-                                updateDate.toString(), int.parse(data[0]));
+                            animal.amFeed = int.parse(data[0]);
                           } else if (data[1] == "MID") {
-                            animal.setMidFeedForDate(
-                                updateDate.toString(), int.parse(data[0]));
+                            animal.midFeed = int.parse(data[0]);
                           } else if (data[1] == "PM") {
-                            animal.setPmFeedForDate(
-                                updateDate.toString(), int.parse(data[0]));
+                            animal.pmFeed = int.parse(data[0]);
                           }
                           if (mounted) {
                             Navigator.of(context).pop(animal);
                           }
                         },
-                        child: Text(animalFeedList[index].name),
+                        child: Text(animalFeedList[index].animalName),
                       )
                     ],
                   );
@@ -251,9 +283,13 @@ class MyHomePageState extends State<MyHomePage> {
   Future feedTimePicker(int animalChoice) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF000000),
+            titleTextStyle: const TextStyle(color: Colors.white),
             title: const Text("Choose feed time:"),
             actions: ["AM", "MID", "PM"]
-                .map((time) => ElevatedButton(
+                .map((time) => FloatingActionButton(
+                    foregroundColor: const Color(0xFF000000),
+                    backgroundColor: const Color(0xFFF28322),
                     onPressed: () async {
                       String amount = await feedAmountPicker() ?? "";
                       if (mounted) {
@@ -269,6 +305,8 @@ class MyHomePageState extends State<MyHomePage> {
   Future<String?> feedAmountPicker() => showDialog<String?>(
         context: context,
         builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF000000),
+          titleTextStyle: const TextStyle(color: Colors.white),
           title: const Text("Enter Amount:"),
           content: TextField(
             autofocus: true,
@@ -280,6 +318,9 @@ class MyHomePageState extends State<MyHomePage> {
           ),
           actions: [
             FloatingActionButton(
+              backgroundColor: const Color(0xFFF28322),
+              foregroundColor: const Color(0xFF000000),
+              heroTag: 'submitbutton',
               onPressed: submitFeedAmount,
               child: const Text("Submit"),
             )
@@ -313,52 +354,52 @@ class MyHomePageState extends State<MyHomePage> {
   //   return out;
   // }
 
-  // void saveData() async {
-  //   print(
-  //       "Saving data for ${animalFeedList.length} animals\n${animalFeedList.map((e) => e.toString()).join("\n")}");
-  //   var updateMap = {};
-  //   for (Animal animal in animalFeedList) {
-  //     if (animal.hasDefaultValues()) continue;
-  //     updateMap[animal.name] = animal.toJson();
-  //   }
-  //   String feedMap = jsonEncode(updateMap);
-
-  //   await _myBox.put(extractDate(selectedDate), feedMap);
-  //   showSnackBar("Saved data for ${updateMap.length} animals");
-  // }
-
-  saveSheet(DateTime dateTime) {
-    print("Saving data to sheet");
-    for (int animalCounter = 0;
-        animalCounter < animalFeedList.length;
-        animalCounter++,) {
-      uploadToSheet(animalCounter, dateTime);
+  void saveData(
+    DateTime receivedDate,
+    List<String> animalnameList,
+  ) async {
+    final Worksheet currentWorkSheet =
+        await SheetService.checkSheetforDate(receivedDate, animalFeedList);
+    for (int i = 0; i < animalnameList.length; i++) {
+      String currentAnimal = animalnameList[i];
+      int currentAnimalStartingRow =
+          await currentWorkSheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+      int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
+      await currentWorkSheet.values
+          .insertValue(animalFeedList[i].amFeed, column: 3, row: amFeedRow);
+      await currentWorkSheet.values.insertValue(animalFeedList[i].midFeed,
+          column: 3, row: amFeedRow + 1);
+      await currentWorkSheet.values
+          .insertValue(animalFeedList[i].pmFeed, column: 3, row: amFeedRow + 2);
     }
   }
 
-  void uploadToSheet(int animalNumber, DateTime currentDate) {
-    int updateValue = animalFeedList[animalNumber]
-        .amFeed(currentDate.toString()); //animalFeedList[animalNumber].amFeed;
-    updateSheetPartTwo(updateValue, 1, animalNumber + 1);
+  Future<bool>? getFeedingDataByDate(
+      DateTime receivedDate, List<Animal> animalList) async {
+    print(receivedDate);
+    final currentWorkSheet =
+        await SheetService.checkSheetforDate(receivedDate, animalFeedList);
 
-    updateValue = animalFeedList[animalNumber].midFeed(currentDate.toString());
-    updateSheetPartTwo(updateValue, 2, animalNumber + 1);
+    await Future.wait(animalList.map((currentAnimal) async {
+      print('fetching data for ${currentAnimal.animalName}');
+      int currentAnimalStartingRow = await currentWorkSheet.values
+          .rowIndexOf(currentAnimal.animalName, inColumn: 6);
+      int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
 
-    updateValue = animalFeedList[animalNumber].pmFeed(currentDate.toString());
-    updateSheetPartTwo(updateValue, 3, animalNumber + 1);
-  }
+      var feedData = await Future.wait([
+        currentWorkSheet.values.value(column: 3, row: amFeedRow), //AM
+        currentWorkSheet.values.value(column: 3, row: amFeedRow + 1), //MID
+        currentWorkSheet.values.value(column: 3, row: amFeedRow + 2), //PM
+      ]);
+      print('feched data for ${currentAnimal.animalName}');
+      currentAnimal.amFeed = int.parse(feedData[0]);
+      currentAnimal.midFeed = int.parse(feedData[1]);
+      currentAnimal.pmFeed = int.parse(feedData[2]);
+    }));
 
-  void updateSheetPartTwo(int toUpload, int columnNumber, int rowNumber) async {
-    //init GSheets
-    final gsheets = GSheets(_credentials);
-
-    //fetch spreadsheet by ID
-    final glboalSheet = await gsheets.spreadsheet(_sheetId);
-
-    //fetch worksheet by title
-    var feedSheet = glboalSheet.worksheetByTitle('AnimalFeedSheet');
-
-    await feedSheet!.values
-        .insertValue(toUpload, column: columnNumber, row: rowNumber);
+    setState(() {
+      isDataLoading = true;
+    });
+    return true;
   }
 }

@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 
 class AnimalCard extends StatefulWidget {
   final List<Animal> animalFeedList;
-  final DateTime useDate;
-  const AnimalCard(this.animalFeedList, this.useDate, {super.key});
+  const AnimalCard(this.animalFeedList, {super.key});
 
   @override
   State<AnimalCard> createState() => _MyWidgetState();
@@ -14,7 +13,7 @@ class _MyWidgetState extends State<AnimalCard> {
   late TextEditingController controller;
   String feedChoice = "MID";
   int animalNumber = 0;
-  late DateTime currentDate;
+
   late List<Animal> animals;
 
   @override
@@ -22,7 +21,6 @@ class _MyWidgetState extends State<AnimalCard> {
     super.initState();
     animals = widget.animalFeedList;
     controller = TextEditingController();
-    currentDate = widget.useDate;
   }
 
   @override
@@ -35,82 +33,31 @@ class _MyWidgetState extends State<AnimalCard> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 500,
+      height: 400,
       child: ListView.builder(
           shrinkWrap: true,
           itemCount: animals.length,
           itemBuilder: (BuildContext context, int index) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(animals[index].name),
-                Text('${animals[index].amFeed(currentDate.toString())}'),
-                //Text("AM:${animals[index].amFeed}"),
-                Text('${animals[index].midFeed(currentDate.toString())}'),
-                Text('${animals[index].pmFeed(currentDate.toString())}'),
-              ],
-            );
+            return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(animals[index].animalName),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text('AM: ${animals[index].amFeed}'),
+                        Text('MID: ${animals[index].midFeed}'),
+                        Text('PM: ${animals[index].pmFeed}'),
+                      ],
+                    )
+                  ],
+                ));
           }),
     );
-
-    /*
-    Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            animalFeedList[animalNumber].animalName,
-          ),
-          Text("AM:${animalFeedList[animalNumber].amFeed.toString()}"),
-          Text("MID:${animalFeedList[animalNumber].midFeed.toString()}"),
-          Text("PM:${animalFeedList[animalNumber].pmFeed.toString()}"),
-          FloatingActionButton(
-            onPressed: () async {
-              final feedAmount = await _dialogBuilder();
-              //if (feedAmount == null || feedAmount.isEmpty) return;
-              await feedPicker();
-              setState(() {
-                if (feedChoice == "AM") {
-                  this.animalFeedList[animalNumber].amFeed = feedAmount as int;
-                } else if (feedChoice == "MID") {
-                  this.animalFeedList[animalNumber].midFeed = feedAmount as int;
-                } else if (feedChoice == "PM") {
-                  this.animalFeedList[animalNumber].pmFeed = feedAmount as int;
-                } else if (feedChoice == "cancel") {
-                  return;
-                }
-              });
-              print(animalFeedList[animalNumber].amFeed);
-            },
-            child: const Text("Add"),
-          )
-        ],
-      ),
-    );
-
-  */
   }
-
-  // Future<int?> _dialogBuilder() => showDialog<int>(
-  //       context: context,
-  //       builder: (context) => AlertDialog(
-  //         title: const Text("Enter amount:"),
-  //         content: TextField(
-  //           autofocus: true,
-  //           controller: controller,
-  //           keyboardType: TextInputType.number,
-  //           inputFormatters: <TextInputFormatter>[
-  //             FilteringTextInputFormatter.digitsOnly
-  //           ],
-  //         ),
-  //         actions: [
-  //           FloatingActionButton(
-  //             onPressed: submit,
-  //             child: const Text("Submit"),
-  //           )
-  //         ],
-  //       ),
-  //     );
 
   void submit() {
     Navigator.of(context).pop(
