@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:documentation_assistant/home_page.dart';
+import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 bool populateDummyData = true;
 //TODO make a bonding sheet
@@ -12,9 +15,12 @@ bool populateDummyData = true;
 //TODO make it pretty
 //
 void main() async {
-  await Hive.initFlutter();
-  await Hive.openBox("animalFeedBox");
-
+  await dotenv.load();
+  print(".env loaded: ${dotenv.env}");
+  final parsedCreds = jsonDecode(dotenv.env["G_SHEETS_CREDS"]!);
+  print("Parsed creds: $parsedCreds");
+  SheetService.setCredentials(dotenv.env["G_SHEETS_CREDS"]!);
+  
   runApp(const MyApp());
 }
 
