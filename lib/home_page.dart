@@ -7,7 +7,6 @@ import 'package:documentation_assistant/feces_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
-import 'package:hive/hive.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -49,7 +48,6 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     controller.dispose();
-    Hive.close();
     super.dispose();
   }
 
