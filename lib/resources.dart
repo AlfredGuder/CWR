@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/sheet_builder.dart';
 import 'package:intl/intl.dart';
@@ -54,8 +56,7 @@ class SheetService {
     final String dateByMonthYear = '${targetDate.month}/${targetDate.year}';
     if (currentSpreadSheet.worksheetByTitle(dateByMonthYear) == null) {
       Worksheet newSheet = await createWorksheet(dateByMonthYear);
-      bool sheetGenerationFinish =
-          await sheetLoadoutInit(targetDate, animalNameList, newSheet);
+      await sheetLoadoutInit(targetDate, animalNameList, newSheet);
       return newSheet;
     } else {
       Worksheet thisSheet =
@@ -131,7 +132,6 @@ class SheetService {
 //TODO add save/load animal functions
 
 enum Month {
-  // ignore: constant_identifier_names
   Jan,
   Feb,
   Mar,

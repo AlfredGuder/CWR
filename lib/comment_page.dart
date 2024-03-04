@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
-import 'resources.dart';
+import 'package:documentation_assistant/resources.dart';
 
 //TODO optimize load time like in home page
-class Comment_Page extends StatefulWidget {
+class CommentPage extends StatefulWidget {
   final List<String> animalNameList;
 
   final DateTime currentDate;
 
-  const Comment_Page({
+  const CommentPage({
     Key? key,
     required this.animalNameList,
     required this.currentDate,
   }) : super(key: key);
 
   @override
-  State<Comment_Page> createState() => _Comment_PageState();
+  State<CommentPage> createState() => _CommentPageState();
 }
 
-class _Comment_PageState extends State<Comment_Page> {
+class _CommentPageState extends State<CommentPage> {
   late List<String> animalNameList;
   late String sheetCreds;
   late String sheetIdentifier;
