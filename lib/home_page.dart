@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
