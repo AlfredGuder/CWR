@@ -18,9 +18,11 @@ class _LoadingTextState extends State<LoadingText> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {setState(() {
-      loopCount = (loopCount+1) % (maxDots+1);
-    }); });
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        loopCount = (loopCount + 1) % (maxDots + 1);
+      });
+    });
   }
 
   @override
@@ -31,8 +33,11 @@ class _LoadingTextState extends State<LoadingText> {
 
   @override
   Widget build(BuildContext context) {
-    String suffix = '.'*loopCount + ' '*(maxDots-loopCount);
+    String suffix = '.' * loopCount + ' ' * (maxDots - loopCount);
 
-    return Text(widget.text + suffix, textAlign: TextAlign.left,);
+    return Text(
+      widget.text + suffix,
+      textAlign: TextAlign.left,
+    );
   }
 }
