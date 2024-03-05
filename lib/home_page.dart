@@ -3,19 +3,14 @@ import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:documentation_assistant/comment_page.dart';
 import 'package:documentation_assistant/resources.dart';
-import 'package:documentation_assistant/sheet_builder.dart';
 import 'package:documentation_assistant/feces_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:googleapis_auth/auth_io.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:googleapis/sheets/v4.dart' as sheets_official;
-//import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-//import 'package:http/http.dart' as http;
-import 'package:hive/hive.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => MyHomePageState();
@@ -45,10 +40,6 @@ class MyHomePageState extends State<MyHomePage> {
     return Resources.hiveDataFormat.format(receivedDate);
   }
 
-  void dateEditingCheck(DateTime checkDate, {bool displaySnackBar = true}) {
-    String useDate = extractDate(checkDate);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -58,7 +49,6 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     controller.dispose();
-    Hive.close();
     super.dispose();
   }
 
@@ -76,7 +66,7 @@ class MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return Comment_Page(
+                  return CommentPage(
                       animalNameList: animalNames, currentDate: selectedDate);
                 }),
               );
@@ -222,7 +212,7 @@ class MyHomePageState extends State<MyHomePage> {
                   }
                 });
           } else {
-            return const Text("Fethcing list of animals...");
+            return const Text("Fetching list of animals...");
           }
         }),
       ),

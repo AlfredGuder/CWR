@@ -2,7 +2,7 @@ import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:gsheets/gsheets.dart';
 
-Future<bool> sheetLoadoutInit(DateTime receivedDate, List<Animal> animalList,
+Future<void> sheetLoadoutInit(DateTime receivedDate, List<Animal> animalList,
     Worksheet currentSheet) async {
   //TODO refactor code so that sheetLoadoutInit launches only when creating a new sheet
   //final currentSheet = await SheetService.getWorkSheetByDate(receivedDate);
@@ -112,7 +112,6 @@ Future<bool> sheetLoadoutInit(DateTime receivedDate, List<Animal> animalList,
 
     nextRow = await finalRowChecker(currentSheet);
   }
-  return true;
 }
 
 finalRowChecker(Worksheet userSheet) async {
