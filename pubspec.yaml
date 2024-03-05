@@ -38,7 +38,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   table_calendar: ^3.0.8
   intl: ^0.18.0
-  gsheets: ^0.4.2
+  gsheets: ^0.5.0
+  googleapis: ^11.4.0 
   flutter_dotenv: ^5.1.0
 
 dev_dependencies:

@@ -9,10 +9,10 @@ class CommentPage extends StatefulWidget {
   final DateTime currentDate;
 
   const CommentPage({
-    Key? key,
+    super.key,
     required this.animalNameList,
     required this.currentDate,
-  }) : super(key: key);
+  });
 
   @override
   State<CommentPage> createState() => _CommentPageState();

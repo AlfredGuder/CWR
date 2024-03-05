@@ -9,8 +9,7 @@ class AnimalAdditionPage extends StatefulWidget {
   final DateTime currentDateTime;
 
   const AnimalAdditionPage(
-      {Key? key, required this.animalDataList, required this.currentDateTime})
-      : super(key: key);
+      {super.key, required this.animalDataList, required this.currentDateTime});
 
   @override
   State<AnimalAdditionPage> createState() => _AnimalAdditionPageState();

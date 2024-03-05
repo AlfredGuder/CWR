@@ -10,10 +10,10 @@ class FecesPage extends StatefulWidget {
   final DateTime currentDate;
 
   const FecesPage({
-    Key? key,
+    super.key,
     required this.animalNames,
     required this.currentDate,
-  }) : super(key: key);
+  });
   @override
   State<FecesPage> createState() => _FecesPageState();
 }
