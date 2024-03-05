@@ -2,6 +2,7 @@ import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:documentation_assistant/comment_page.dart';
+import 'package:documentation_assistant/loading_text.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:documentation_assistant/feces_page.dart';
 import 'package:flutter/material.dart';
@@ -136,9 +137,10 @@ class MyHomePageState extends State<MyHomePage> {
                   if (isDataLoading == true) {
                     return SingleChildScrollView(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                   "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
@@ -207,11 +209,11 @@ class MyHomePageState extends State<MyHomePage> {
                       ),
                     );
                   } else {
-                    return const Text('fetching feeding data');
+                    return const Center(child: LoadingText('Fetching feeding data'));
                   }
                 });
           } else {
-            return const Text("Fetching list of animals...");
+            return const Center(child: LoadingText("Fetching list of animals"));
           }
         }),
       ),
@@ -378,7 +380,7 @@ class MyHomePageState extends State<MyHomePage> {
       int currentAnimalStartingRow = await currentWorkSheet.values
           .rowIndexOf(currentAnimal.animalName, inColumn: 6);
       int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
-
+      print("Fetching feed data for ${currentAnimal.animalName}");
       var feedData = await Future.wait([
         currentWorkSheet.values.value(column: 3, row: amFeedRow), //AM
         currentWorkSheet.values.value(column: 3, row: amFeedRow + 1), //MID
