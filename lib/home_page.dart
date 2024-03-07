@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
@@ -11,7 +13,7 @@ import 'package:gsheets/gsheets.dart';
 import 'package:googleapis/sheets/v4.dart' as sheets_official;
 //import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 //import 'package:http/http.dart' as http;
-import 'package:hive/hive.dart';
+//import 'package:hive/hive.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -374,23 +376,12 @@ class MyHomePageState extends State<MyHomePage> {
 
   Future<bool>? getFeedingDataByDate(
       DateTime receivedDate, List<Animal> animalList) async {
-    try {
-      final currentSpreadSheet = await SheetService.getSpreadsheet();
+    Worksheet currentWorksheet =
+        await SheetService.getWorkSheetByDate(receivedDate);
 
-      try {
-        await fetchBatchData(currentSpreadSheet, animalList, receivedDate);
-        setState(() {
-          isDataLoading = true;
-        });
-        return true;
-      } catch (e) {
-        print('Error fetching data: $e');
-        return false;
-      } finally {}
-    } catch (e, stackTrace) {
-      print('Error obtaining credentials: $e');
-      print(stackTrace);
-    }
+    setState(() {
+      isDataLoading = true;
+    });
     return true;
   }
 
@@ -423,31 +414,61 @@ class MyHomePageState extends State<MyHomePage> {
   //   return true;
   // }
 
-  Future<void> fetchBatchData(Spreadsheet currentSheet, List<Animal> animalList,
-      DateTime receivedDate) async {
-    final batchRequest = sheets_official.BatchUpdateValuesRequest()
-      ..valueInputOption = 'RAW'
-      ..data = [];
-    Worksheet currentWorksheet =
-        await SheetService.getWorkSheetByDate(receivedDate);
-    for (int i = 0; i < animalList.length; i++) {
-      final currentAnimal = animalList[i];
+  // Future<void> fetchBatchData(Spreadsheet currentSheet, List<Animal> animalList,
+  //     DateTime receivedDate) async {
+  //   Worksheet currentWorkSheet =
+  //       await SheetService.getWorkSheetByDate(receivedDate);
 
-      int currentAnimalStartingRow = await currentWorksheet.values
-          .rowIndexOf(currentAnimal.animalName, inColumn: 6);
-      int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
+  //   Map<String, int> amFeedRowMap = {};
 
-      final valueRange = sheets_official.ValueRange()
-        ..range = '$currentSheet!C$amFeedRow:C${amFeedRow + 2}'
-        ..values = [
-          [currentAnimal.amFeed],
-          [currentAnimal.midFeed],
-          [currentAnimal.pmFeed],
-        ];
+  //   animalList.map((animal) {
+  //     amFeedRowMap.putIfAbsent(animal.animalName, () => 0);
+  //   });
 
-      batchRequest.data!.add(valueRange);
-    }
+  //   for (Animal thisAnimal in animalList) {
+  //     int nameRow = await currentWorkSheet.values
+  //         .rowIndexOf(thisAnimal.animalName, inColumn: 6);
+  //     int amFeedRow = nameRow + (3 * receivedDate.day - 1);
+  //     amFeedRowMap[thisAnimal.animalName] = amFeedRow;
+  //   }
 
-    currentSheet.batchUpdate([batchRequest.toJson()]);
-  }
+  //   final dataFilters = animalList.map((currentAnimal) {
+  //     final currentAnimalName = currentAnimal.animalName;
+
+  //     return sheets_official.DataFilter(
+  //       a1Range:
+  //           '${currentWorkSheet.title}!C${amFeedRowMap[currentAnimalName]}:C${amFeedRowMap[currentAnimalName]! + 2}',
+  //     );
+  //   }).toList();
+
+  //   List<String> valuesInColumn = await currentWorkSheet.values.column(3);
+
+  // }
+  // Future<void> fetchBatchData(Spreadsheet currentSheet, List<Animal> animalList,
+  //     DateTime receivedDate) async {
+  //   final batchRequest = sheets_official.BatchUpdateValuesRequest()
+  //     ..valueInputOption = 'RAW'
+  //     ..data = [];
+  //   Worksheet currentWorksheet =
+  //       await SheetService.getWorkSheetByDate(receivedDate);
+  //   for (int i = 0; i < animalList.length; i++) {
+  //     final currentAnimal = animalList[i];
+
+  //     int currentAnimalStartingRow = await currentWorksheet.values
+  //         .rowIndexOf(currentAnimal.animalName, inColumn: 6);
+  //     int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
+
+  //     final valueRange = sheets_official.ValueRange()
+  //       ..range = '$currentSheet!C$amFeedRow:C${amFeedRow + 2}'
+  //       ..values = [
+  //         [currentAnimal.amFeed],
+  //         [currentAnimal.midFeed],
+  //         [currentAnimal.pmFeed],
+  //       ];
+
+  //     batchRequest.data!.add(valueRange);
+  //   }
+
+  //   currentSheet.batchUpdate([batchRequest.toJson()]);
+  // }
 }
