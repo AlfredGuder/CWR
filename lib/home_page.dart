@@ -367,7 +367,7 @@ class MyHomePageState extends State<MyHomePage> {
   Future<bool>? getFeedingDataByDate(
       DateTime receivedDate, List<Animal> animalList) async {
     Worksheet currentWorksheet =
-        await SheetService.getWorkSheetByDate(receivedDate);
+        await SheetService.checkSheetforDate(receivedDate, animalFeedList);
 
     Map<String, int> animalAmFeedRows = {};
 
