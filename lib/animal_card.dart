@@ -44,6 +44,10 @@ class _MyWidgetState extends State<AnimalCard> {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
+                    const Divider(
+                      color: Colors.orange,
+                      thickness: 1.5,
+                    ),
                     Text(animals[index].animalName),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

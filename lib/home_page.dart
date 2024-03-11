@@ -1,4 +1,4 @@
-import 'dart:ffi';
+//import 'dart:ffi';
 
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_addition.dart';
@@ -9,12 +9,7 @@ import 'package:documentation_assistant/resources.dart';
 import 'package:documentation_assistant/feces_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:googleapis_auth/auth_io.dart';
 import 'package:gsheets/gsheets.dart';
-import 'package:googleapis/sheets/v4.dart' as sheets_official;
-//import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-//import 'package:http/http.dart' as http;
-//import 'package:hive/hive.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -25,8 +20,6 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   late TextEditingController controller;
-  String feedChoice = "MID";
-  String animalChoice = "Willa";
   DateTime selectedDate = DateTime.now();
   int firstDay = 0;
 
@@ -39,12 +32,6 @@ class MyHomePageState extends State<MyHomePage> {
     animalFeedList = await SheetService.animalFeedListBuilder();
     isFeedListBuilt = true;
     return true;
-  }
-
-  String extractDate(DateTime receivedDate) {
-    print(
-        "Converting $receivedDate => ${Resources.hiveDataFormat.format(receivedDate)}");
-    return Resources.hiveDataFormat.format(receivedDate);
   }
 
   @override
@@ -149,9 +136,10 @@ class MyHomePageState extends State<MyHomePage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                  "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
-                              FloatingActionButton(
+                              FloatingActionButton.extended(
+                                extendedPadding: EdgeInsets.all(2),
+                                label: Text(
+                                    "${selectedDate.year}/${selectedDate.month}/${selectedDate.day}"),
                                 backgroundColor: (Colors.orange),
                                 foregroundColor: (Colors.black),
                                 onPressed: () async {
@@ -173,7 +161,6 @@ class MyHomePageState extends State<MyHomePage> {
                                     }),
                                   );
                                 },
-                                child: const Text("C"),
                               ),
                             ],
                           ),
@@ -381,6 +368,25 @@ class MyHomePageState extends State<MyHomePage> {
       DateTime receivedDate, List<Animal> animalList) async {
     Worksheet currentWorksheet =
         await SheetService.getWorkSheetByDate(receivedDate);
+
+    Map<String, int> animalAmFeedRows = {};
+
+    List<String> nameColumnValues = await currentWorksheet.values.column(6);
+    for (Animal currentAnimal in animalList) {
+      int animalNameRowNumber =
+          nameColumnValues.indexOf(currentAnimal.animalName);
+      int amFeedRow = animalNameRowNumber + (3 * receivedDate.day - 1);
+      animalAmFeedRows.putIfAbsent(currentAnimal.animalName, () => amFeedRow);
+    }
+
+    List<String> columnValues = await currentWorksheet.values.column(3);
+
+    for (int i = 0; i < animalFeedList.length; i++) {
+      int rowToRetrieve = animalAmFeedRows[animalFeedList[i].animalName]!;
+      animalFeedList[i].amFeed = int.parse(columnValues[rowToRetrieve]);
+      animalFeedList[i].midFeed = int.parse(columnValues[rowToRetrieve + 1]);
+      animalFeedList[i].pmFeed = int.parse(columnValues[rowToRetrieve + 2]);
+    }
 
     setState(() {
       isDataLoading = true;

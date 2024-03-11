@@ -38,20 +38,33 @@ class _FecesPageState extends State<FecesPage> {
     // setState(() {
     //   isDataLoading = true;
     // });
-
+    List<bool> tempCheckList = [];
     Worksheet currentWorksheet = await SheetService.getWorkSheetByDate(useDate);
-    List<bool> tempCheckList =
-        await Future.wait(nameList.map((animalName) async {
-      print('fetching data for $animalName');
-      int currentAnimalStartRow =
-          await currentWorksheet.values.rowIndexOf(animalName, inColumn: 6);
-      int rowToCheck = currentAnimalStartRow + (3 * useDate.day) - 1;
+    List<String> sheetReturnValues = await currentWorksheet.values.column(4);
+    List<String> nameRowList = await currentWorksheet.values.column(6);
+    for (String currentAnimal in nameList) {
+      int currentAnimalNameRow = nameRowList.indexOf(currentAnimal);
+      int fecesRow = currentAnimalNameRow + (3 * useDate.day - 1);
+      fecesStateMap[currentAnimal] = sheetReturnValues[fecesRow];
+      if (fecesStateMap[currentAnimal] == 'Yes') {
+        tempCheckList.add(true);
+      } else {
+        tempCheckList.add(false);
+      }
+    }
 
-      var fecesData =
-          await currentWorksheet.values.value(column: 4, row: rowToCheck);
+    // List<bool> tempCheckList =
+    //     await Future.wait(nameList.map((animalName) async {
+    //   print('fetching data for $animalName');
+    //   int currentAnimalStartRow =
+    //       await currentWorksheet.values.rowIndexOf(animalName, inColumn: 6);
+    //   int rowToCheck = currentAnimalStartRow + (3 * useDate.day) - 1;
 
-      return fecesData == 'Yes';
-    }));
+    //   var fecesData =
+    //       await currentWorksheet.values.value(column: 4, row: rowToCheck);
+
+    //   return fecesData == 'Yes';
+    // }));
 
     setState(() {
       animalFecesButtonState =
@@ -81,7 +94,7 @@ class _FecesPageState extends State<FecesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF27127),
+          backgroundColor: (Colors.orange),
           foregroundColor: (Colors.black),
           title: const Text("Feces"),
         ),
@@ -93,44 +106,43 @@ class _FecesPageState extends State<FecesPage> {
               // snapshot.connectionState == ConnectionState.done
               if (isDataLoading == true) {
                 //int data = snapshot.data!;
-                return Column(
-                  children: [
-                    FloatingActionButton(
-                      heroTag: 'returnButton',
-                      backgroundColor: const Color(0xFFF27127),
-                      foregroundColor: (Colors.black),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Return'),
-                    ),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: nameList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(nameList[index]),
-                              FloatingActionButton(
-                                backgroundColor: const Color(0xFFF27127),
-                                foregroundColor: (Colors.black),
-                                heroTag: 'fecesCheckButton$index',
-                                onPressed: () => updateFecesList(index),
-                                child: Text(animalFecesButtonState[index]),
-                              )
-                            ],
-                          );
-                        }),
-                    FloatingActionButton(
-                      heroTag: 'saveButton',
-                      backgroundColor: const Color(0xFFF27127),
-                      foregroundColor: (Colors.black),
-                      onPressed: () => saveToSheet(useDate),
-                      child: const Text('sheet'),
-                    )
-                  ],
-                );
+                return Column(children: [
+                  ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: nameList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(nameList[index]),
+                            FloatingActionButton(
+                              backgroundColor: (Colors.orange),
+                              foregroundColor: (Colors.black),
+                              heroTag: 'fecesCheckButton$index',
+                              onPressed: () => updateFecesList(index),
+                              child: Text(animalFecesButtonState[index]),
+                            )
+                          ],
+                        );
+                      }),
+                  FloatingActionButton(
+                    heroTag: 'saveButton',
+                    backgroundColor: (Colors.orange),
+                    foregroundColor: (Colors.black),
+                    onPressed: () => saveToSheet(useDate),
+                    child: const Text('sheet'),
+                  ),
+
+                  // FloatingActionButton(
+                  //   heroTag: 'returnButton',
+                  //   backgroundColor: const Color(0xFFF27127),
+                  //   foregroundColor: (Colors.black),
+                  //   onPressed: () {
+                  //     Navigator.pop(context);
+                  //   },
+                  //   child: const Text('Return'),
+                  // ),
+                ]);
               } else {
                 return const Text("Loading...");
               }

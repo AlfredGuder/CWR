@@ -44,6 +44,8 @@ class _CommentPageState extends State<CommentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.black,
           title: const Text('Comments'),
         ),
         body: Center(
@@ -54,12 +56,6 @@ class _CommentPageState extends State<CommentPage> {
               if (isDataLoading == true) {
                 return Column(
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Return'),
-                    ),
                     ListView.builder(
                         shrinkWrap: true,
                         itemCount: animalNameList.length,
@@ -68,7 +64,11 @@ class _CommentPageState extends State<CommentPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(animalNameList[index]),
-                              ElevatedButton(
+                              FloatingActionButton(
+                                heroTag:
+                                    'checkButtonFor${animalNameList[index]}',
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.black,
                                 onPressed: () async {
                                   await commentScreen(animalNameList[index]);
                                 },
@@ -100,26 +100,37 @@ class _CommentPageState extends State<CommentPage> {
 
     String searchDate = useDate.day.toString();
     Worksheet currentWorksheet = await SheetService.getWorkSheetByDate(useDate);
-    for (int i = 0; i < animalNameList.length; i++) {
-      String currentAnimal = animalNameList[i];
-      int currentAnimalStartingRow =
-          await currentWorksheet.values.rowIndexOf(currentAnimal, inColumn: 6);
-      int commentRow =
-          currentAnimalStartingRow + (3 * int.parse(searchDate) - 1);
-      String receivedCommentString =
-          await currentWorksheet.values.value(column: 7, row: commentRow);
 
-      if (receivedCommentString == 'No comments for today') {
-        animalCommentMap[currentAnimal]!.add(receivedCommentString);
+    List<String> animalNameValues = await currentWorksheet.values.column(6);
+    List<String> commentRowValues = await currentWorksheet.values.column(7);
+
+    for (String currentAnimal in animalNameList) {
+      int animalNameRow = animalNameValues.indexOf(currentAnimal);
+      int commentRow = animalNameRow + (3 * useDate.day - 1);
+      String currentAnimalCommentData = commentRowValues[commentRow];
+
+      if (currentAnimalCommentData == 'No comments for today') {
+        animalCommentMap[currentAnimal]!.add(currentAnimalCommentData);
       } else {
-        List<String> spltCommentStringList = receivedCommentString.split('//');
+        List<String> spltCommentStringList =
+            currentAnimalCommentData.split('//');
         for (int j = 0; j < spltCommentStringList.length; j++) {
           animalCommentMap[currentAnimal]!.add(spltCommentStringList[j]);
         }
       }
-
-      //animalCommentMap[currentAnimal]!.add(receivedCommentString);
     }
+
+    // for (int i = 0; i < animalNameList.length; i++) {
+    //   String currentAnimal = animalNameList[i];
+    //   int currentAnimalStartingRow =
+    //       await currentWorksheet.values.rowIndexOf(currentAnimal, inColumn: 6);
+    //   int commentRow =
+    //       currentAnimalStartingRow + (3 * int.parse(searchDate) - 1);
+    //   String receivedCommentString =
+    //       await currentWorksheet.values.value(column: 7, row: commentRow);
+
+    //   //animalCommentMap[currentAnimal]!.add(receivedCommentString);
+    // }
     setState(() {
       isDataLoading = true;
     });
@@ -132,6 +143,13 @@ class _CommentPageState extends State<CommentPage> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
+              backgroundColor: Colors.black,
+              titleTextStyle: const TextStyle(
+                color: Colors.white,
+              ),
+              contentTextStyle: const TextStyle(
+                color: Colors.orange,
+              ),
               title: Text('Comments for $currentAnimal'),
               content: SizedBox(
                 height: 200,
@@ -152,18 +170,27 @@ class _CommentPageState extends State<CommentPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(
+                    FloatingActionButton(
+                        heroTag: 'cancelButton',
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
                         onPressed: () {
                           Navigator.pop(context);
                         },
                         child: const Text('Cancel')),
-                    ElevatedButton(
+                    FloatingActionButton(
+                        heroTag: 'removeButton',
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
                         onPressed: () {
                           removeButton(currentAnimal);
                           setState(() {});
                         },
                         child: const Text('Remove')),
-                    ElevatedButton(
+                    FloatingActionButton(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
+                        heroTag: 'addButton',
                         onPressed: () async {
                           String newPotentialComment =
                               await commentAdder() ?? '';
@@ -180,7 +207,10 @@ class _CommentPageState extends State<CommentPage> {
                           }
                         },
                         child: const Text('Add')),
-                    ElevatedButton(
+                    FloatingActionButton(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
+                        heroTag: 'saveButton',
                         onPressed: () {
                           saveCommentString(currentAnimal);
                           Navigator.of(context).pop();
@@ -227,6 +257,13 @@ class _CommentPageState extends State<CommentPage> {
   Future<String?> commentAdder() => showDialog<String?>(
       context: context,
       builder: (context) => AlertDialog(
+            backgroundColor: Colors.black,
+            titleTextStyle: const TextStyle(
+              color: Colors.white,
+            ),
+            contentTextStyle: const TextStyle(
+              color: Colors.white,
+            ),
             title: const Text('Write new comment'),
             content: TextField(
               autofocus: true,
@@ -235,6 +272,8 @@ class _CommentPageState extends State<CommentPage> {
             ),
             actions: [
               FloatingActionButton(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.black,
                 onPressed: submitComment,
                 //return controller.text;
                 //controller.clear();
