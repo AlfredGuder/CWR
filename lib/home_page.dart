@@ -4,9 +4,11 @@ import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/animal_addition.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:documentation_assistant/comment_page.dart';
+import 'package:documentation_assistant/hot_wire_page.dart';
 import 'package:documentation_assistant/loading_text.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:documentation_assistant/feces_page.dart';
+import 'package:documentation_assistant/sheet_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
@@ -56,6 +58,11 @@ class MyHomePageState extends State<MyHomePage> {
         actions: [
           PopupMenuButton<String>(onSelected: (value) {
             print('Selected $value');
+            if (value == 'Hotwire') {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return HotWirePage(currentDate: selectedDate);
+              }));
+            }
             if (value == 'Comment') {
               Navigator.push(
                 context,
@@ -83,6 +90,15 @@ class MyHomePageState extends State<MyHomePage> {
             }
           }, itemBuilder: (BuildContext context) {
             return [
+              const PopupMenuItem(
+                  value: 'Hotwire',
+                  child: Row(
+                    children: [
+                      Icon(Icons.bolt),
+                      SizedBox(width: 8),
+                      Text('Hotwire'),
+                    ],
+                  )),
               const PopupMenuItem(
                 value: 'Comment',
                 child: Row(
@@ -186,7 +202,7 @@ class MyHomePageState extends State<MyHomePage> {
                                     controller.clear();
                                   }
                                 },
-                                child: const Text("Add"),
+                                child: const Text("Edit"),
                               ),
                               FloatingActionButton(
                                 backgroundColor: (Colors.orange),

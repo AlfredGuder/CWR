@@ -130,7 +130,7 @@ class _FecesPageState extends State<FecesPage> {
                     backgroundColor: (Colors.orange),
                     foregroundColor: (Colors.black),
                     onPressed: () => saveToSheet(useDate),
-                    child: const Text('sheet'),
+                    child: const Text('save'),
                   ),
 
                   // FloatingActionButton(
