@@ -2,6 +2,47 @@ import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:gsheets/gsheets.dart';
 
+Future<void> sheetBuildHotwire(List<String> campList, String title) async {
+  Worksheet currentWorkSheet =
+      await SheetService.getWorkSheetByTitle('Hotwire -$title');
+
+  //Makes the first collumn
+  List<String> columnValues = [];
+  for (int i = 0; i < campList.length; i++) {
+    columnValues.add(campList[i]);
+    for (int j = 1; j < 33; j++) {
+      columnValues.add(j.toString());
+    }
+    columnValues.add('');
+  }
+  await currentWorkSheet.values.insertColumn(1, columnValues);
+  List<String> monthName = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'Augast',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+  for (int k = 0; k < 12; k++) {
+    columnValues.clear();
+    for (int l = 0; l < campList.length; l++) {
+      columnValues.add(monthName[k]);
+      for (int j = 0; j < 32; j++) {
+        columnValues.add('0');
+      }
+      columnValues.add('');
+    }
+    await currentWorkSheet.values.insertColumn(k + 2, columnValues);
+  }
+
+  //Makes the second collumn
+}
+
 Future<void> sheetLoadoutInit(DateTime receivedDate, List<Animal> animalList,
     Worksheet currentSheet) async {
   //TODO refactor code so that sheetLoadoutInit launches only when creating a new sheet

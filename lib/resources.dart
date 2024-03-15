@@ -10,10 +10,9 @@ class Resources {
 }
 
 class SheetService {
-
-static void setCredentials(String creds) {
-  _credentials = creds;
-}
+  static void setCredentials(String creds) {
+    _credentials = creds;
+  }
 
   //create credentials
   static late String _credentials;
@@ -41,11 +40,38 @@ static void setCredentials(String creds) {
         await createWorksheet(dateByMonthYear);
   }
 
-  static Future<Worksheet?> getWorkSheetByTitle(String title) async {
+  static Future<Worksheet> getWorkSheetByTitle(String title) async {
     final sheetsClient = GSheets(_credentials);
     final currentSpreadSheet = await sheetsClient.spreadsheet(_spreadsheetId);
 
-    return currentSpreadSheet.worksheetByTitle(title);
+    return currentSpreadSheet.worksheetByTitle(title) ??
+        await createWorksheet(title);
+  }
+
+  static Future<Worksheet> checkHotWireSheet(DateTime targetDate) async {
+    final sheetsClient = GSheets(_credentials);
+    final currentSpreadSheet = await sheetsClient.spreadsheet(_spreadsheetId);
+    if (currentSpreadSheet
+            .worksheetByTitle('Hotwire -${targetDate.year.toString()}') ==
+        null) {
+      Worksheet newSheet =
+          await createWorksheet('Hotwire -${targetDate.year.toString()}');
+      await sheetBuildHotwire([
+        'LemurFalls',
+        'CPF1',
+        'CPF2',
+        'CPF3',
+        'CPF4',
+        'CPF5',
+        'CPF6',
+        'CPF7',
+      ], targetDate.year.toString());
+      return newSheet;
+    } else {
+      Worksheet thisSheet = currentSpreadSheet
+          .worksheetByTitle('Hotwire -${targetDate.year.toString()}')!;
+      return thisSheet;
+    }
   }
 
   static Future<Worksheet> checkSheetforDate(
@@ -126,25 +152,14 @@ static void setCredentials(String creds) {
     return await globalSheet.addWorksheet(title);
   }
 
-  static Future<List<Animal>>? getAnimalsByDate(DateTime targetDate) { return Future.value([]);}
+  static Future<List<Animal>>? getAnimalsByDate(DateTime targetDate) {
+    return Future.value([]);
+  }
 }
 
 //TODO add save/load animal functions
 
-enum Month {
-  Jan,
-  Feb,
-  Mar,
-  Apr,
-  May,
-  Jun,
-  Jul,
-  Aug,
-  Sep,
-  Oct,
-  Nov,
-  Dec
-}
+enum Month { Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec }
 
 extension NumberUtils on Month {
   int days() {
