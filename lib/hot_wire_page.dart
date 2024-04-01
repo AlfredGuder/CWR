@@ -1,5 +1,6 @@
 import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
+import 'package:documentation_assistant/loading_text.dart';
 import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
 
@@ -43,7 +44,7 @@ class _HotWirePageState extends State<HotWirePage> {
 
       int checkRow = startRow + useDate.day;
 
-      double campValue = double.parse(allValues[checkRow]);
+      double campValue = double.parse(allValues[checkRow - 1]);
 
       // double campValue = double.parse(await currentWorksheet.values
       //     .value(column: checkColumn, row: checkRow));
@@ -88,7 +89,11 @@ class _HotWirePageState extends State<HotWirePage> {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(campList[index]),
+                        SizedBox(
+                          width: 150,
+                          height: 50,
+                          child: Text(campList[index]),
+                        ),
                         FloatingActionButton(
                           heroTag: 'fenceButton${campList[index]}',
                           backgroundColor: Colors.orange,
@@ -113,7 +118,13 @@ class _HotWirePageState extends State<HotWirePage> {
                     );
                   });
             } else {
-              return const Text('Loading...');
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [LoadingText('Fetching fence values')],
+                ),
+              );
             }
           },
         ),

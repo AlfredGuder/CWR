@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:documentation_assistant/resources.dart';
+import 'package:documentation_assistant/loading_text.dart';
 
 //TODO optimize load time like in home page
 class CommentPage extends StatefulWidget {
@@ -63,7 +64,11 @@ class _CommentPageState extends State<CommentPage> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Text(animalNameList[index]),
+                              SizedBox(
+                                width: 100,
+                                height: 50,
+                                child: Text(animalNameList[index]),
+                              ),
                               FloatingActionButton(
                                 heroTag:
                                     'checkButtonFor${animalNameList[index]}',
@@ -80,7 +85,13 @@ class _CommentPageState extends State<CommentPage> {
                   ],
                 );
               } else {
-                return const Text("Loading...");
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [LoadingText('Loading comments')],
+                  ),
+                );
               }
             },
           ),

@@ -41,17 +41,20 @@ class _MyWidgetState extends State<AnimalCard> {
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Divider(
                       color: Colors.orange,
                       thickness: 1.5,
                     ),
-                    Text(animals[index].animalName),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        SizedBox(
+                          height: 40,
+                          width: 100,
+                          child: Center(child: Text(animals[index].animalName)),
+                        ),
                         Text('AM: ${animals[index].amFeed}'),
                         Text('MID: ${animals[index].midFeed}'),
                         Text('PM: ${animals[index].pmFeed}'),

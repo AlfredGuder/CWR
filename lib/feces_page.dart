@@ -1,5 +1,7 @@
 //import 'dart:ffi';
 
+import 'package:documentation_assistant/loading_icon.dart';
+import 'package:documentation_assistant/loading_text.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
@@ -114,7 +116,11 @@ class _FecesPageState extends State<FecesPage> {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(nameList[index]),
+                            SizedBox(
+                              height: 40,
+                              width: 100,
+                              child: Text(nameList[index]),
+                            ),
                             FloatingActionButton(
                               backgroundColor: (Colors.orange),
                               foregroundColor: (Colors.black),
@@ -144,7 +150,13 @@ class _FecesPageState extends State<FecesPage> {
                   // ),
                 ]);
               } else {
-                return const Text("Loading...");
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [LoadingText('Loading')],
+                  ),
+                );
               }
             },
           ),

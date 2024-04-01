@@ -33,6 +33,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.black,
         title: const Text("Animal List"),
       ),
       body: Center(
@@ -51,10 +53,26 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(currentAnimalList[index].animalName),
-                            Text(currentAnimalList[index].species),
-                            Text(currentAnimalList[index].sex),
-                            Text(currentAnimalList[index].arksNo),
+                            SizedBox(
+                              width: 100,
+                              height: 50,
+                              child: Text(currentAnimalList[index].animalName),
+                            ),
+                            SizedBox(
+                              width: 150,
+                              height: 50,
+                              child: Text(currentAnimalList[index].species),
+                            ),
+                            SizedBox(
+                              width: 75,
+                              height: 50,
+                              child: Text(currentAnimalList[index].sex),
+                            ),
+                            SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Text(currentAnimalList[index].arksNo),
+                            ),
                           ],
                         )
                       ],
@@ -65,6 +83,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FloatingActionButton(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.black,
                     heroTag: 'addButton',
                     onPressed: () async {
                       Animal? animalToAdd = await addAnimal();
@@ -81,6 +101,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                     },
                     child: const Text('Add')),
                 FloatingActionButton(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.black,
                   heroTag: 'removeButton',
                   onPressed: () async {
                     Animal? animalToRemove =
@@ -227,6 +249,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
             ),
             actions: [
               FloatingActionButton(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.black,
                 heroTag: 'arksAddButton',
                 onPressed: () {
                   Navigator.of(context).pop(controller.text);

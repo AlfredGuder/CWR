@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:documentation_assistant/loading_icon.dart';
 import 'package:flutter/material.dart';
 
 class LoadingText extends StatefulWidget {
@@ -35,9 +36,14 @@ class _LoadingTextState extends State<LoadingText> {
   Widget build(BuildContext context) {
     String suffix = '.' * loopCount + ' ' * (maxDots - loopCount);
 
-    return Text(
-      widget.text + suffix,
-      textAlign: TextAlign.left,
+    return Column(
+      children: [
+        const LoadingIcon(),
+        Text(
+          widget.text + suffix,
+          textAlign: TextAlign.left,
+        ),
+      ],
     );
   }
 }

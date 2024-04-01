@@ -220,11 +220,22 @@ class MyHomePageState extends State<MyHomePage> {
                     );
                   } else {
                     return const Center(
-                        child: LoadingText('Fetching feeding data'));
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [LoadingText('Fetching feeding data')],
+                      ),
+                    );
                   }
                 });
           } else {
-            return const Center(child: LoadingText("Fetching list of animals"));
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [LoadingText('Fetching list of animals')],
+              ),
+            );
           }
         }),
       ),

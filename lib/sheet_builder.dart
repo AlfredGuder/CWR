@@ -43,6 +43,7 @@ Future<void> sheetBuildHotwire(List<String> campList, String title) async {
   //Makes the second collumn
 }
 
+//TODO rework sheetbuilder to use the format that sheetBuildHotwire uses
 Future<void> sheetLoadoutInit(DateTime receivedDate, List<Animal> animalList,
     Worksheet currentSheet) async {
   //TODO refactor code so that sheetLoadoutInit launches only when creating a new sheet
