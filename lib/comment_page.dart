@@ -55,13 +55,16 @@ class _CommentPageState extends State<CommentPage> {
             future: isDataLoading ? null : generateCommentMap(),
             builder: (context, snapshot) {
               if (isDataLoading == true) {
-                return Column(
-                  children: [
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: animalNameList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Row(
+                return SizedBox(
+                  height: 500,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: animalNameList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               SizedBox(
@@ -80,9 +83,15 @@ class _CommentPageState extends State<CommentPage> {
                                 child: const Text('Check'),
                               ),
                             ],
-                          );
-                        })
-                  ],
+                          ),
+                          const Divider(
+                            color: Colors.orange,
+                            thickness: 1.5,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 );
               } else {
                 return const Center(
@@ -215,6 +224,7 @@ class _CommentPageState extends State<CommentPage> {
                               animalCommentMap[currentAnimal]!
                                   .add(newPotentialComment);
                             });
+                            saveCommentString(currentAnimal);
                           }
                         },
                         child: const Text('Add')),

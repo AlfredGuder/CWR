@@ -168,8 +168,6 @@ class MyHomePageState extends State<MyHomePage> {
 
                                   if (newDate == null) return;
 
-                                  //getFeedingDataByDate(newDate, animalNames);
-
                                   setState(
                                     (() {
                                       selectedDate = newDate;
@@ -195,6 +193,7 @@ class MyHomePageState extends State<MyHomePage> {
                                         (Animal animal) =>
                                             animal.animalName ==
                                             animalToUpdate.animalName);
+                                    saveThisData(selectedDate, animalToUpdate);
                                     setState(() {
                                       animalFeedList[animalIndex] =
                                           animalToUpdate;
@@ -240,6 +239,25 @@ class MyHomePageState extends State<MyHomePage> {
         }),
       ),
     );
+  }
+
+  Future<void> saveThisData(
+    DateTime receivedDate,
+    Animal animalToSave,
+  ) async {
+    final Worksheet currentWorkSheet =
+        await SheetService.checkSheetforDate(receivedDate, animalFeedList);
+
+    String currentAnimalName = animalToSave.animalName;
+    int currentAnimalStartingRow = await currentWorkSheet.values
+        .rowIndexOf(currentAnimalName, inColumn: 6);
+    int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
+    await currentWorkSheet.values
+        .insertValue(animalToSave.amFeed, column: 3, row: amFeedRow);
+    await currentWorkSheet.values
+        .insertValue(animalToSave.midFeed, column: 3, row: amFeedRow + 1);
+    await currentWorkSheet.values
+        .insertValue(animalToSave.pmFeed, column: 3, row: amFeedRow + 2);
   }
 
   List<String> animalNames = [];
@@ -357,20 +375,6 @@ class MyHomePageState extends State<MyHomePage> {
     ));
   }
 
-  // Map<String, Animal> readAnimalsFromDate(DateTime tarrgetDate) {
-  //   String dateKey = extractDate(tarrgetDate);
-  //   var savedData = _myBox.get(dateKey);
-  //   if (savedData == null) {
-  //     return {};
-  //   }
-
-  //   Map<String, dynamic> decodedData = jsonDecode(savedData);
-  //   Map<String, Animal> out = {}..addEntries(decodedData.entries
-  //       .map((e) => MapEntry(e.key, Animal.fromJson(jsonDecode(e.value)))));
-
-  //   return out;
-  // }
-
   void saveData(
     DateTime receivedDate,
     List<String> animalnameList,
@@ -420,91 +424,4 @@ class MyHomePageState extends State<MyHomePage> {
     });
     return true;
   }
-
-  // Future<bool>? getFeedingDataByDate(
-  //     DateTime receivedDate, List<Animal> animalList) async {
-  //   print(receivedDate);
-  //   final currentWorkSheet =
-  //       await SheetService.checkSheetforDate(receivedDate, animalFeedList);
-
-  //   await Future.wait(animalList.map((currentAnimal) async {
-  //     print('fetching data for ${currentAnimal.animalName}');
-  //     int currentAnimalStartingRow = await currentWorkSheet.values
-  //         .rowIndexOf(currentAnimal.animalName, inColumn: 6);
-  //     int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
-
-  //     var feedData = await Future.wait([
-  //       currentWorkSheet.values.value(column: 3, row: amFeedRow), //AM
-  //       currentWorkSheet.values.value(column: 3, row: amFeedRow + 1), //MID
-  //       currentWorkSheet.values.value(column: 3, row: amFeedRow + 2), //PM
-  //     ]);
-  //     print('feched data for ${currentAnimal.animalName}');
-  //     currentAnimal.amFeed = int.parse(feedData[0]);
-  //     currentAnimal.midFeed = int.parse(feedData[1]);
-  //     currentAnimal.pmFeed = int.parse(feedData[2]);
-  //   }));
-
-  //   setState(() {
-  //     isDataLoading = true;
-  //   });
-  //   return true;
-  // }
-
-  // Future<void> fetchBatchData(Spreadsheet currentSheet, List<Animal> animalList,
-  //     DateTime receivedDate) async {
-  //   Worksheet currentWorkSheet =
-  //       await SheetService.getWorkSheetByDate(receivedDate);
-
-  //   Map<String, int> amFeedRowMap = {};
-
-  //   animalList.map((animal) {
-  //     amFeedRowMap.putIfAbsent(animal.animalName, () => 0);
-  //   });
-
-  //   for (Animal thisAnimal in animalList) {
-  //     int nameRow = await currentWorkSheet.values
-  //         .rowIndexOf(thisAnimal.animalName, inColumn: 6);
-  //     int amFeedRow = nameRow + (3 * receivedDate.day - 1);
-  //     amFeedRowMap[thisAnimal.animalName] = amFeedRow;
-  //   }
-
-  //   final dataFilters = animalList.map((currentAnimal) {
-  //     final currentAnimalName = currentAnimal.animalName;
-
-  //     return sheets_official.DataFilter(
-  //       a1Range:
-  //           '${currentWorkSheet.title}!C${amFeedRowMap[currentAnimalName]}:C${amFeedRowMap[currentAnimalName]! + 2}',
-  //     );
-  //   }).toList();
-
-  //   List<String> valuesInColumn = await currentWorkSheet.values.column(3);
-
-  // }
-  // Future<void> fetchBatchData(Spreadsheet currentSheet, List<Animal> animalList,
-  //     DateTime receivedDate) async {
-  //   final batchRequest = sheets_official.BatchUpdateValuesRequest()
-  //     ..valueInputOption = 'RAW'
-  //     ..data = [];
-  //   Worksheet currentWorksheet =
-  //       await SheetService.getWorkSheetByDate(receivedDate);
-  //   for (int i = 0; i < animalList.length; i++) {
-  //     final currentAnimal = animalList[i];
-
-  //     int currentAnimalStartingRow = await currentWorksheet.values
-  //         .rowIndexOf(currentAnimal.animalName, inColumn: 6);
-  //     int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
-
-  //     final valueRange = sheets_official.ValueRange()
-  //       ..range = '$currentSheet!C$amFeedRow:C${amFeedRow + 2}'
-  //       ..values = [
-  //         [currentAnimal.amFeed],
-  //         [currentAnimal.midFeed],
-  //         [currentAnimal.pmFeed],
-  //       ];
-
-  //     batchRequest.data!.add(valueRange);
-  //   }
-
-  //   currentSheet.batchUpdate([batchRequest.toJson()]);
-  // }
 }

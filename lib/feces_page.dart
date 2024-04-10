@@ -107,48 +107,54 @@ class _FecesPageState extends State<FecesPage> {
             builder: (context, snapshot) {
               // snapshot.connectionState == ConnectionState.done
               if (isDataLoading == true) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 500,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: nameList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    SizedBox(
+                                      height: 40,
+                                      width: 100,
+                                      child: Text(nameList[index]),
+                                    ),
+                                    FloatingActionButton(
+                                      backgroundColor: (Colors.orange),
+                                      foregroundColor: (Colors.black),
+                                      heroTag: 'fecesCheckButton$index',
+                                      onPressed: () => updateFecesList(index),
+                                      child:
+                                          Text(animalFecesButtonState[index]),
+                                    )
+                                  ],
+                                ),
+                                const Divider(
+                                  color: Colors.orange,
+                                ),
+                              ],
+                            );
+                          }),
+                    ),
+                    FloatingActionButton(
+                      heroTag: 'saveButton',
+                      backgroundColor: (Colors.orange),
+                      foregroundColor: (Colors.black),
+                      onPressed: () => saveToSheet(useDate),
+                      child: const Text('save'),
+                    ),
+                  ],
+                );
                 //int data = snapshot.data!;
-                return Column(children: [
-                  ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: nameList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            SizedBox(
-                              height: 40,
-                              width: 100,
-                              child: Text(nameList[index]),
-                            ),
-                            FloatingActionButton(
-                              backgroundColor: (Colors.orange),
-                              foregroundColor: (Colors.black),
-                              heroTag: 'fecesCheckButton$index',
-                              onPressed: () => updateFecesList(index),
-                              child: Text(animalFecesButtonState[index]),
-                            )
-                          ],
-                        );
-                      }),
-                  FloatingActionButton(
-                    heroTag: 'saveButton',
-                    backgroundColor: (Colors.orange),
-                    foregroundColor: (Colors.black),
-                    onPressed: () => saveToSheet(useDate),
-                    child: const Text('save'),
-                  ),
-
-                  // FloatingActionButton(
-                  //   heroTag: 'returnButton',
-                  //   backgroundColor: const Color(0xFFF27127),
-                  //   foregroundColor: (Colors.black),
-                  //   onPressed: () {
-                  //     Navigator.pop(context);
-                  //   },
-                  //   child: const Text('Return'),
-                  // ),
-                ]);
               } else {
                 return const Center(
                   child: Column(

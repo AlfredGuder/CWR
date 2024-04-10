@@ -128,6 +128,9 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
   Future<Animal?> nameRemovalScreen(List<Animal> localAnimalList) => showDialog(
       context: context,
       builder: (context) => AlertDialog(
+            backgroundColor: Colors.black,
+            titleTextStyle: TextStyle(color: Colors.white),
+            contentTextStyle: TextStyle(color: Colors.white),
             title: const Text('Pick an animal to remove'),
             content: SizedBox(
               height: 200,
@@ -138,7 +141,9 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                 itemBuilder: (BuildContext context, int index) {
                   return Column(
                     children: [
-                      ElevatedButton(
+                      FloatingActionButton(
+                          foregroundColor: Colors.black,
+                          backgroundColor: Colors.orange,
                           onPressed: () {
                             Navigator.of(context).pop(localAnimalList[index]);
                           },
@@ -172,6 +177,9 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
   Future<String?> nameAdditionScreen() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          backgroundColor: Colors.black,
+          titleTextStyle: TextStyle(color: Colors.white),
+          contentTextStyle: TextStyle(color: Colors.white),
           title: const Text('Enter Animal Name:'),
           content: TextField(
             autofocus: true,
@@ -180,6 +188,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
           ),
           actions: [
             FloatingActionButton(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.black,
               heroTag: 'acceptName',
               onPressed: () {
                 Navigator.of(context).pop(controller.text);
@@ -194,6 +204,9 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
   Future<String?> speciesAdditionScreen() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          backgroundColor: Colors.black,
+          titleTextStyle: TextStyle(color: Colors.white),
+          contentTextStyle: TextStyle(color: Colors.white),
           title: const Text('Enter Animal Species'),
           content: TextField(
             autofocus: true,
@@ -202,6 +215,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
           ),
           actions: [
             FloatingActionButton(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.black,
               heroTag: 'acceptSpecies',
               onPressed: () {
                 Navigator.of(context).pop(controller.text);
@@ -216,9 +231,14 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
   Future<String?> sexAdditionScreen() => showDialog(
       context: context,
       builder: (context) => AlertDialog(
+            backgroundColor: Colors.black,
+            titleTextStyle: TextStyle(color: Colors.white),
+            contentTextStyle: TextStyle(color: Colors.white),
             title: const Text('Choose animal gender'),
             actions: [
               FloatingActionButton(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.black,
                 heroTag: 'MaleButton',
                 onPressed: () {
                   Navigator.of(context).pop('Male');
@@ -226,6 +246,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
                 child: const Text('Male'),
               ),
               FloatingActionButton(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.black,
                 heroTag: 'FemaleButton',
                 onPressed: () {
                   Navigator.of(context).pop('Female');
@@ -238,6 +260,9 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
   Future<String?> arksAdditionScreen() => showDialog(
       context: context,
       builder: (context) => AlertDialog(
+            backgroundColor: Colors.black,
+            titleTextStyle: TextStyle(color: Colors.white),
+            contentTextStyle: TextStyle(color: Colors.white),
             title: const Text('Enter Animal Arks number'),
             content: TextField(
               autofocus: true,
