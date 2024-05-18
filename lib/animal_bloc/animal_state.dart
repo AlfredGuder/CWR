@@ -1,5 +1,6 @@
 import 'package:documentation_assistant/animal.dart';
 import 'package:documentation_assistant/loading_text.dart';
+import 'package:flutter/material.dart';
 
 sealed class AnimalState {}
 
@@ -33,4 +34,17 @@ enum ViewablePages {
   Animal,
   Comment,
   Fence,
+}
+
+extension AppBarExtention on ViewablePages {
+  String get displayName => switch (this) {
+        ViewablePages.Animal => 'Feeding Data',
+        ViewablePages.Comment => 'Comments',
+        ViewablePages.Fence => 'Hotwire',
+      };
+  IconData get displayIcon => switch (this) {
+        ViewablePages.Animal => Icons.catching_pokemon,
+        ViewablePages.Comment => Icons.comment,
+        ViewablePages.Fence => Icons.bolt,
+      };
 }

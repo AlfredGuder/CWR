@@ -1,4 +1,5 @@
 import 'package:documentation_assistant/animal_bloc/animal_bloc.dart';
+import 'package:documentation_assistant/animal_bloc/animal_event.dart';
 import 'package:documentation_assistant/animal_bloc/animal_state.dart';
 import 'package:documentation_assistant/bloc_animal_page.dart';
 import 'package:documentation_assistant/loading_text.dart';
@@ -36,47 +37,26 @@ class _BlocHomeState extends State<BlocHome> {
                 PopupMenuButton<String>(onSelected: (value) {
                   bool enabled = state is! LoadingState;
                   print('Selected $value $enabled');
+                  if (enabled) {
+                    context
+                        .read<AnimalBloc>()
+                        .add(ViewPage(page: viewablePagesFromString(value)!));
+                  }
                 }, itemBuilder: (BuildContext context) {
-                  return [
-                    const PopupMenuItem(
-                        value: 'Hotwire',
-                        child: Row(
-                          children: [
-                            Icon(Icons.bolt),
-                            SizedBox(width: 8),
-                            Text('Hotwire'),
-                          ],
-                        )),
-                    const PopupMenuItem(
-                      value: 'Comment',
-                      child: Row(
-                        children: [
-                          Icon(Icons.comment),
-                          SizedBox(width: 8),
-                          Text('Comment'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'Animals',
-                      child: Row(
-                        children: [
-                          Icon(Icons.add),
-                          SizedBox(width: 8),
-                          Text('Animals')
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                        value: 'Feces',
-                        child: Row(
-                          children: [
-                            Icon(Icons.whatshot),
-                            SizedBox(width: 8),
-                            Text('Feces'),
-                          ],
-                        ))
-                  ];
+                  return ViewablePages.values
+                      .map(
+                        (e) => PopupMenuItem(
+                          value: e.displayName,
+                          child: Row(
+                            children: [
+                              Icon(e.displayIcon),
+                              SizedBox(width: 8),
+                              Text(e.displayName),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList();
                 }),
               ],
             ),
@@ -95,4 +75,13 @@ class _BlocHomeState extends State<BlocHome> {
       ),
     );
   }
+}
+
+ViewablePages? viewablePagesFromString(String value) {
+  return switch (value) {
+    'Feeding Data' => ViewablePages.Animal,
+    'Comments' => ViewablePages.Comment,
+    'Hotwire' => ViewablePages.Fence,
+    _ => null
+  };
 }
