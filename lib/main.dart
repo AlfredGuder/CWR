@@ -1,3 +1,4 @@
+import 'package:documentation_assistant/bloc_home.dart';
 import 'package:documentation_assistant/home_page.dart';
 import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ bool populateDummyData = true;
 //TODO tracing who added a comment into the thing
 //TODO animal training docs
 //TODO make it pretty
-//
+//change animal list to a set
 void main() async {
   await dotenv.load();
   SheetService.setCredentials(dotenv.env["G_SHEETS_CREDS"]!);
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
             bodyMedium: TextStyle(color: Colors.white),
           )),
       title: "Documentation Assistant",
-      home: const MyHomePage(),
+      home: const BlocHome(),
     );
   }
 }

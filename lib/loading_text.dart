@@ -47,3 +47,9 @@ class _LoadingTextState extends State<LoadingText> {
     );
   }
 }
+
+enum LoadingTypes {
+  Animal,
+  FeedingData,
+  FenceValue,
+}

@@ -174,7 +174,7 @@ Future<void> addAnimalToFeedSheet(Animal newAnimal) async {
     newAnimal.sex,
     newAnimal.arksNo,
   ];
-  int rowToAdd = await finalRowChecker(currentSheet!);
+  int rowToAdd = await finalRowChecker(currentSheet);
   await currentSheet.values.insertRow(rowToAdd, newAnimalRow);
 }
 

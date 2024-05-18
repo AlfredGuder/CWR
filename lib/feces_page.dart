@@ -6,6 +6,8 @@ import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
 import 'package:gsheets/gsheets.dart';
 
+//TODO merge as a tickbox on feedpage
+
 class FecesPage extends StatefulWidget {
   final List<String> animalNames;
 

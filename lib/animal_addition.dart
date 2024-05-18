@@ -129,8 +129,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
       context: context,
       builder: (context) => AlertDialog(
             backgroundColor: Colors.black,
-            titleTextStyle: TextStyle(color: Colors.white),
-            contentTextStyle: TextStyle(color: Colors.white),
+            titleTextStyle: const TextStyle(color: Colors.white),
+            contentTextStyle: const TextStyle(color: Colors.white),
             title: const Text('Pick an animal to remove'),
             content: SizedBox(
               height: 200,
@@ -178,8 +178,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.black,
-          titleTextStyle: TextStyle(color: Colors.white),
-          contentTextStyle: TextStyle(color: Colors.white),
+          titleTextStyle: const TextStyle(color: Colors.white),
+          contentTextStyle: const TextStyle(color: Colors.white),
           title: const Text('Enter Animal Name:'),
           content: TextField(
             autofocus: true,
@@ -205,8 +205,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.black,
-          titleTextStyle: TextStyle(color: Colors.white),
-          contentTextStyle: TextStyle(color: Colors.white),
+          titleTextStyle: const TextStyle(color: Colors.white),
+          contentTextStyle: const TextStyle(color: Colors.white),
           title: const Text('Enter Animal Species'),
           content: TextField(
             autofocus: true,
@@ -232,8 +232,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
       context: context,
       builder: (context) => AlertDialog(
             backgroundColor: Colors.black,
-            titleTextStyle: TextStyle(color: Colors.white),
-            contentTextStyle: TextStyle(color: Colors.white),
+            titleTextStyle: const TextStyle(color: Colors.white),
+            contentTextStyle: const TextStyle(color: Colors.white),
             title: const Text('Choose animal gender'),
             actions: [
               FloatingActionButton(
@@ -261,8 +261,8 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
       context: context,
       builder: (context) => AlertDialog(
             backgroundColor: Colors.black,
-            titleTextStyle: TextStyle(color: Colors.white),
-            contentTextStyle: TextStyle(color: Colors.white),
+            titleTextStyle: const TextStyle(color: Colors.white),
+            contentTextStyle: const TextStyle(color: Colors.white),
             title: const Text('Enter Animal Arks number'),
             content: TextField(
               autofocus: true,

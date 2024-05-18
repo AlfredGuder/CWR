@@ -1,13 +1,13 @@
 import 'package:documentation_assistant/resources.dart';
 import 'package:flutter/material.dart';
 import 'package:documentation_assistant/loading_text.dart';
-import 'package:flutter/services.dart';
+
 import 'package:gsheets/gsheets.dart';
 
 class HotWirePage extends StatefulWidget {
   final DateTime currentDate;
 
-  HotWirePage({Key? key, required this.currentDate}) : super(key: key);
+   const HotWirePage({Key? key, required this.currentDate}) : super(key: key);
 
   @override
   State<HotWirePage> createState() => _HotWirePageState();

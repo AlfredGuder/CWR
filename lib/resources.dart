@@ -138,7 +138,7 @@ class SheetService {
 
   static Future<void> removeAnimalRow(String animalName) async {
     Worksheet? animalDataSheet = await getWorkSheetByTitle('AnimalFeedSheet');
-    int removeRow = await animalDataSheet!.values.rowIndexOf(animalName);
+    int removeRow = await animalDataSheet.values.rowIndexOf(animalName);
     animalDataSheet.deleteRow(removeRow);
   }
 
