@@ -2,6 +2,7 @@ import 'package:documentation_assistant/animal_bloc/animal_bloc.dart';
 import 'package:documentation_assistant/animal_bloc/animal_event.dart';
 import 'package:documentation_assistant/animal_bloc/animal_state.dart';
 import 'package:documentation_assistant/bloc_animal_page.dart';
+import 'package:documentation_assistant/bloc_feces_page.dart';
 import 'package:documentation_assistant/loading_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,7 +69,9 @@ class _BlocHomeState extends State<BlocHome> {
                   LoadingTypes.FenceValue => 'Loading fence values',
                 }),
               PageViewState() => BlocAnimalPage(
-                  selectedDate: state.currentDate, animals: state.loadedAnimals)
+                  selectedDate: state.currentDate,
+                  animals: state.loadedAnimals),
+              //PageViewState() => BlocFecesPage()
             },
           );
         },
@@ -82,6 +85,7 @@ ViewablePages? viewablePagesFromString(String value) {
     'Feeding Data' => ViewablePages.Animal,
     'Comments' => ViewablePages.Comment,
     'Hotwire' => ViewablePages.Fence,
+    'Addition' => ViewablePages.Addition,
     _ => null
   };
 }
