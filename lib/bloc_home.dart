@@ -39,9 +39,8 @@ class _BlocHomeState extends State<BlocHome> {
                   bool enabled = state is! LoadingState;
                   print('Selected $value $enabled');
                   if (enabled) {
-                    context
-                        .read<AnimalBloc>()
-                        .add(ViewPage(page: viewablePagesFromString(value)!));
+                    AnimalBloc bloc = context.read<AnimalBloc>();
+                    bloc.add(ViewPage(page: viewablePagesFromString(value)!));
                   }
                 }, itemBuilder: (BuildContext context) {
                   return ViewablePages.values
@@ -72,6 +71,7 @@ class _BlocHomeState extends State<BlocHome> {
                   selectedDate: state.currentDate,
                   animals: state.loadedAnimals),
               //PageViewState() => BlocFecesPage()
+              // TODO: Handle this case.
             },
           );
         },

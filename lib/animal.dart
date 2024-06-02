@@ -19,18 +19,6 @@ class Animal {
       required this.midFeed,
       required this.pmFeed});
 
-  // Animal.fromJson(Map<String, dynamic> json)
-  //     : animalName = json["animalName"],
-  //       amFeed = json["amFeed"],
-  //       midFeed = json["midFeed"],
-  //       pmFeed = json["pmFeed"];
-
-  // Animal.defaultAnimal(String name)
-  //     : animalName = name,
-  //       amFeed = 0,
-  //       midFeed = 0,
-  //       pmFeed = 0;
-
   bool hasDefaultValues() {
     return amFeed == 0 && midFeed == 0 && pmFeed == 0;
   }
@@ -60,10 +48,9 @@ class Animal {
     ''';
   }
 
-  // static List<Animal> dummyData = [
-  //   Animal(animalName: "Willa", amFeed: 0, midFeed: 0, pmFeed: 0),
-  //   Animal(animalName: "Valora", amFeed: 0, midFeed: 0, pmFeed: 0),
-  //   Animal(animalName: "Xayla", amFeed: 0, midFeed: 0, pmFeed: 0),
-  //   Animal(animalName: "Cho gath", amFeed: 0, midFeed: 0, pmFeed: 5)
-  // ];
+  @override
+  operator ==(other) => other is Animal && other.arksNo == arksNo;
+
+  @override
+  int get hashCode => arksNo.hashCode;
 }

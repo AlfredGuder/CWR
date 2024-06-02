@@ -1,7 +1,10 @@
 import 'package:documentation_assistant/animal.dart';
+import 'package:documentation_assistant/animal_bloc/animal_bloc.dart';
+import 'package:documentation_assistant/animal_bloc/animal_event.dart';
 import 'package:documentation_assistant/animal_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:documentation_assistant/resources.dart';
 
@@ -73,10 +76,15 @@ class _BlocAnimalPageState extends State<BlocAnimalPage> {
                     int animalIndex = widget.animals.toList().indexWhere(
                         (Animal animal) =>
                             animal.animalName == animalToUpdate.animalName);
-                    saveThisData(widget.selectedDate, animalToUpdate);
-                    setState(() {
-                      widget.animals.toList()[animalIndex] = animalToUpdate;
-                    });
+
+                    //TODO rework setState call to use bloc instead
+                    if (mounted) {
+                      AnimalBloc bloc = context.read<AnimalBloc>();
+                      bloc.add(AddFeedEvent(
+                          animalToAdd: animalToUpdate,
+                          currentDate: widget.selectedDate));
+                    }
+
                     controller.clear();
                   }
                 },
@@ -131,24 +139,6 @@ class _BlocAnimalPageState extends State<BlocAnimalPage> {
   }
 
 //saves the data that was just added
-  Future<void> saveThisData(
-    DateTime receivedDate,
-    Animal animalToSave,
-  ) async {
-    final Worksheet currentWorkSheet = await SheetService.checkSheetforDate(
-        receivedDate, widget.animals.toList());
-
-    String currentAnimalName = animalToSave.animalName;
-    int currentAnimalStartingRow = await currentWorkSheet.values
-        .rowIndexOf(currentAnimalName, inColumn: 6);
-    int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
-    await currentWorkSheet.values
-        .insertValue(animalToSave.amFeed, column: 3, row: amFeedRow);
-    await currentWorkSheet.values
-        .insertValue(animalToSave.midFeed, column: 3, row: amFeedRow + 1);
-    await currentWorkSheet.values
-        .insertValue(animalToSave.pmFeed, column: 3, row: amFeedRow + 2);
-  }
 
 //Creates a pop menu that the user can select which animal they would like to modify
   Future<Animal?> animalPicker() => showDialog(

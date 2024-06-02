@@ -25,6 +25,19 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
           case ViewPage():
             emit(PageViewState(
                 animalSet: loadedAnimals, date: currentDate, page: event.page));
+          case AddFeedEvent(
+              animalToAdd: Animal targetToAdd,
+              currentDate: DateTime curretDate
+            ):
+            saveThisData(curretDate, targetToAdd, loadedAnimals.toList());
+            loadedAnimals.lookup(targetToAdd)!
+              ..amFeed = targetToAdd.amFeed
+              ..midFeed = targetToAdd.midFeed
+              ..pmFeed = targetToAdd.pmFeed;
+            emit(PageViewState(
+                page: ViewablePages.Animal,
+                date: curretDate,
+                animalSet: loadedAnimals));
         }
       },
     );
@@ -65,4 +78,25 @@ Future<void> loadFeedingDataForDate(
     animals[i].midFeed = int.parse(columnValues[rowToRetrieve + 1]);
     animals[i].pmFeed = int.parse(columnValues[rowToRetrieve + 2]);
   }
+}
+
+//TODO parse lsit of new animals, and list of old animals, calculate which ones chanced, only update them
+Future<void> saveThisData(
+  DateTime receivedDate,
+  Animal animalToSave,
+  List<Animal> allAnimals,
+) async {
+  final Worksheet currentWorkSheet =
+      await SheetService.checkSheetforDate(receivedDate, allAnimals);
+
+  String currentAnimalName = animalToSave.animalName;
+  int currentAnimalStartingRow =
+      await currentWorkSheet.values.rowIndexOf(currentAnimalName, inColumn: 6);
+  int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
+  await currentWorkSheet.values
+      .insertValue(animalToSave.amFeed, column: 3, row: amFeedRow);
+  await currentWorkSheet.values
+      .insertValue(animalToSave.midFeed, column: 3, row: amFeedRow + 1);
+  await currentWorkSheet.values
+      .insertValue(animalToSave.pmFeed, column: 3, row: amFeedRow + 2);
 }
