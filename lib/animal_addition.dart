@@ -157,14 +157,14 @@ class _AnimalAdditionPageState extends State<AnimalAdditionPage> {
 
   Future<Animal?> addAnimal() async {
     Animal newAnimal = Animal(
-      animalName: 'tempName',
-      species: 'tempSpecies',
-      sex: 'tempSex',
-      arksNo: 'tempNo',
-      amFeed: 0,
-      midFeed: 0,
-      pmFeed: 0,
-    );
+        animalName: 'tempName',
+        species: 'tempSpecies',
+        sex: 'tempSex',
+        arksNo: 'tempNo',
+        amFeed: 0,
+        midFeed: 0,
+        pmFeed: 0,
+        feces: false);
     newAnimal.animalName = await nameAdditionScreen() ?? '';
     controller.clear();
 

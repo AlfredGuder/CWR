@@ -5,6 +5,7 @@ class Animal {
   int amFeed = 0;
   int midFeed = 0;
   int pmFeed = 0;
+  bool feces = false;
   String species;
   String sex;
   String arksNo;
@@ -17,7 +18,8 @@ class Animal {
       required this.arksNo,
       required this.amFeed,
       required this.midFeed,
-      required this.pmFeed});
+      required this.pmFeed,
+      required this.feces});
 
   bool hasDefaultValues() {
     return amFeed == 0 && midFeed == 0 && pmFeed == 0;

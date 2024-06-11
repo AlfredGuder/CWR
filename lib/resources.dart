@@ -128,6 +128,7 @@ class SheetService {
         amFeed: 0,
         midFeed: 0,
         pmFeed: 0,
+        feces: false,
       );
       print('Fetched animaldata');
       animalListToReturn.add(newAnimalToList);

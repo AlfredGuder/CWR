@@ -21,3 +21,9 @@ class AddFeedEvent extends AnimalEvent {
   final DateTime currentDate;
   const AddFeedEvent({required this.animalToAdd, required this.currentDate});
 }
+
+class AddFecesEvent extends AnimalEvent {
+  final String animalName;
+  final bool fecesBool;
+  const AddFecesEvent({required this.animalName, required this.fecesBool});
+}

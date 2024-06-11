@@ -35,6 +35,7 @@ enum ViewablePages {
   Comment,
   Fence,
   Addition,
+  Feces,
 }
 
 extension AppBarExtention on ViewablePages {
@@ -43,11 +44,13 @@ extension AppBarExtention on ViewablePages {
         ViewablePages.Comment => 'Comments',
         ViewablePages.Fence => 'Hotwire',
         ViewablePages.Addition => 'Addition',
+        ViewablePages.Feces => 'Feces',
       };
   IconData get displayIcon => switch (this) {
         ViewablePages.Animal => Icons.catching_pokemon,
         ViewablePages.Comment => Icons.comment,
         ViewablePages.Fence => Icons.bolt,
-        ViewablePages.Addition => Icons.playlist_add_rounded
+        ViewablePages.Addition => Icons.playlist_add_rounded,
+        ViewablePages.Feces => Icons.whatshot,
       };
 }

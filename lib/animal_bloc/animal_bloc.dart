@@ -38,6 +38,17 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
                 page: ViewablePages.Animal,
                 date: curretDate,
                 animalSet: loadedAnimals));
+
+          case AddFecesEvent(
+              animalName: String animalName,
+              fecesBool: bool fecesBool
+            ):
+            loadedAnimals.lookup(animalName)!.feces =
+                !loadedAnimals.lookup(animalName)!.feces;
+            emit(PageViewState(
+                page: ViewablePages.Feces,
+                date: currentDate,
+                animalSet: loadedAnimals));
         }
       },
     );
@@ -53,50 +64,61 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     loadedAnimals.addAll(animalList);
     add(const ViewPage(page: ViewablePages.Animal));
   }
-}
 
-Future<void> loadFeedingDataForDate(
-    DateTime currentDate, List<Animal> animals) async {
-  Worksheet currentWorksheet =
-      await SheetService.checkSheetforDate(currentDate, animals);
+  Future<void> loadFeedingDataForDate(
+      DateTime currentDate, List<Animal> animals) async {
+    Worksheet currentWorksheet =
+        await SheetService.checkSheetforDate(currentDate, animals);
 
-  Map<String, int> animalAmFeedRows = {};
+    Map<String, int> animalAmFeedRows = {};
 
-  List<String> nameColumnValues = await currentWorksheet.values.column(6);
-  for (Animal currentAnimal in animals) {
-    int animalNameRowNumber =
-        nameColumnValues.indexOf(currentAnimal.animalName);
-    int amFeedRow = animalNameRowNumber + (3 * currentDate.day - 1);
-    animalAmFeedRows.putIfAbsent(currentAnimal.animalName, () => amFeedRow);
+    List<String> nameColumnValues = await currentWorksheet.values.column(6);
+    for (Animal currentAnimal in animals) {
+      int animalNameRowNumber =
+          nameColumnValues.indexOf(currentAnimal.animalName);
+      int amFeedRow = animalNameRowNumber + (3 * currentDate.day - 1);
+      animalAmFeedRows.putIfAbsent(currentAnimal.animalName, () => amFeedRow);
+    }
+
+    List<String> columnValues = await currentWorksheet.values.column(3);
+
+    for (int i = 0; i < animals.length; i++) {
+      int rowToRetrieve = animalAmFeedRows[animals[i].animalName]!;
+      animals[i].amFeed = int.parse(columnValues[rowToRetrieve]);
+      animals[i].midFeed = int.parse(columnValues[rowToRetrieve + 1]);
+      animals[i].pmFeed = int.parse(columnValues[rowToRetrieve + 2]);
+    }
   }
-
-  List<String> columnValues = await currentWorksheet.values.column(3);
-
-  for (int i = 0; i < animals.length; i++) {
-    int rowToRetrieve = animalAmFeedRows[animals[i].animalName]!;
-    animals[i].amFeed = int.parse(columnValues[rowToRetrieve]);
-    animals[i].midFeed = int.parse(columnValues[rowToRetrieve + 1]);
-    animals[i].pmFeed = int.parse(columnValues[rowToRetrieve + 2]);
-  }
-}
 
 //TODO parse lsit of new animals, and list of old animals, calculate which ones chanced, only update them
-Future<void> saveThisData(
-  DateTime receivedDate,
-  Animal animalToSave,
-  List<Animal> allAnimals,
-) async {
-  final Worksheet currentWorkSheet =
-      await SheetService.checkSheetforDate(receivedDate, allAnimals);
+  Future<void> saveThisData(
+    DateTime receivedDate,
+    Animal animalToSave,
+    List<Animal> allAnimals,
+  ) async {
+    final Worksheet currentWorkSheet =
+        await SheetService.checkSheetforDate(receivedDate, allAnimals);
 
-  String currentAnimalName = animalToSave.animalName;
-  int currentAnimalStartingRow =
-      await currentWorkSheet.values.rowIndexOf(currentAnimalName, inColumn: 6);
-  int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
-  await currentWorkSheet.values
-      .insertValue(animalToSave.amFeed, column: 3, row: amFeedRow);
-  await currentWorkSheet.values
-      .insertValue(animalToSave.midFeed, column: 3, row: amFeedRow + 1);
-  await currentWorkSheet.values
-      .insertValue(animalToSave.pmFeed, column: 3, row: amFeedRow + 2);
+    String currentAnimalName = animalToSave.animalName;
+    int currentAnimalStartingRow = await currentWorkSheet.values
+        .rowIndexOf(currentAnimalName, inColumn: 6);
+    int amFeedRow = currentAnimalStartingRow + (3 * receivedDate.day - 1);
+    await currentWorkSheet.values
+        .insertValue(animalToSave.amFeed, column: 3, row: amFeedRow);
+    await currentWorkSheet.values
+        .insertValue(animalToSave.midFeed, column: 3, row: amFeedRow + 1);
+    await currentWorkSheet.values
+        .insertValue(animalToSave.pmFeed, column: 3, row: amFeedRow + 2);
+  }
+
+//  loadedAnimals.lookup(targetToAdd)!
+//               ..amFeed = targetToAdd.amFeed
+//               ..midFeed = targetToAdd.midFeed
+//               ..pmFeed = targetToAdd.pmFeed;
+
+//fecesList
 }
+
+
+//Feces page
+
