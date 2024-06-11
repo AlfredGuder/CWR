@@ -103,6 +103,7 @@ ViewablePages? viewablePagesFromString(String value) {
     'Comments' => ViewablePages.Comment,
     'Hotwire' => ViewablePages.Fence,
     'Addition' => ViewablePages.Addition,
+    'Feces' => ViewablePages.Feces,
     _ => null
   };
 }

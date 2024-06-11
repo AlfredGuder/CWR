@@ -81,12 +81,19 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     }
 
     List<String> columnValues = await currentWorksheet.values.column(3);
+    List<String> fecesValues = await currentWorksheet.values.column(4);
 
     for (int i = 0; i < animals.length; i++) {
       int rowToRetrieve = animalAmFeedRows[animals[i].animalName]!;
       animals[i].amFeed = int.parse(columnValues[rowToRetrieve]);
       animals[i].midFeed = int.parse(columnValues[rowToRetrieve + 1]);
       animals[i].pmFeed = int.parse(columnValues[rowToRetrieve + 2]);
+      String fecesText = fecesValues[rowToRetrieve];
+      if (fecesText == 'Yes') {
+        animals[i].feces = true;
+      } else {
+        animals[i].feces = false;
+      }
     }
   }
 

@@ -18,27 +18,15 @@ class BlocFecesPage extends StatefulWidget {
 
 class _BlocFecesPageState extends State<BlocFecesPage> {
   late Set<Animal> animalSet;
-  late List<String> nameList;
-  late List<bool> fecesList;
-  late List<String> fecesButtonText;
+  late Map<String, bool> fecesMap = {};
+  late List<String> nameList = [];
+  late List<String> fecesButtonText = [];
 
   @override
   void initState() {
     super.initState();
     animalSet = widget.animals;
-    for (Animal targetAnimal in animalSet) {
-      nameList.add(targetAnimal.animalName);
-    }
-    for (String thisName in nameList) {
-      fecesList.add(animalSet.lookup(thisName)!.feces);
-    }
-    for (bool fecesState in fecesList) {
-      if (fecesState == true) {
-        fecesButtonText.add('Yes');
-      } else {
-        fecesButtonText.add('No');
-      }
-    }
+    setupPage();
   }
 
   @override
@@ -72,7 +60,7 @@ class _BlocFecesPageState extends State<BlocFecesPage> {
                               AnimalBloc bloc = context.read<AnimalBloc>();
                               bloc.add(AddFecesEvent(
                                   animalName: nameList[index],
-                                  fecesBool: fecesList[index]));
+                                  fecesBool: fecesMap[nameList[index]]!));
                             }
                           },
                           child: Text(fecesButtonText[index]),
@@ -101,5 +89,20 @@ class _BlocFecesPageState extends State<BlocFecesPage> {
         ),
       ],
     );
+  }
+
+  void setupPage() {
+    for (Animal targetAnimal in animalSet) {
+      fecesMap.putIfAbsent(targetAnimal.animalName, () => false);
+
+      nameList.add(targetAnimal.animalName);
+    }
+    for (String name in nameList) {
+      if (fecesMap[name] == false) {
+        fecesButtonText.add('No');
+      } else {
+        fecesButtonText.add('Yes');
+      }
+    }
   }
 }
