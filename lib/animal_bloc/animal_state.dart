@@ -9,7 +9,7 @@ class AppInitialState extends AnimalState {
 }
 
 sealed class DataDisplayState extends AnimalState {
-  final Set<Animal> loadedAnimals;
+  final List<Animal> loadedAnimals;
   final DateTime currentDate;
   DataDisplayState({required this.loadedAnimals, required this.currentDate});
 }
@@ -26,8 +26,8 @@ class PageViewState extends DataDisplayState {
   PageViewState(
       {required this.page,
       required DateTime date,
-      required Set<Animal> animalSet})
-      : super(currentDate: date, loadedAnimals: animalSet);
+      required List<Animal> animalList})
+      : super(currentDate: date, loadedAnimals: animalList);
 }
 
 enum ViewablePages {

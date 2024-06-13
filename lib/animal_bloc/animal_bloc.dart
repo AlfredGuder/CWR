@@ -10,7 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gsheets/gsheets.dart';
 
 class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
-  Set<Animal> loadedAnimals = {};
+  List<Animal> loadedAnimals = [];
 
   DateTime currentDate = DateTime.now();
   AnimalBloc() : super(AppInitialState()) {
@@ -24,31 +24,39 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
             emit(LoadingState(loadingTypes: event.loadingTypes));
           case ViewPage():
             emit(PageViewState(
-                animalSet: loadedAnimals, date: currentDate, page: event.page));
+                animalList: loadedAnimals,
+                date: currentDate,
+                page: event.page));
           case AddFeedEvent(
               animalToAdd: Animal targetToAdd,
               currentDate: DateTime curretDate
             ):
-            saveThisData(curretDate, targetToAdd, loadedAnimals.toList());
-            loadedAnimals.lookup(targetToAdd)!
+            saveThisData(curretDate, targetToAdd, loadedAnimals);
+            int animalNumber = loadedAnimals.indexOf(targetToAdd);
+            loadedAnimals[animalNumber]
               ..amFeed = targetToAdd.amFeed
               ..midFeed = targetToAdd.midFeed
               ..pmFeed = targetToAdd.pmFeed;
             emit(PageViewState(
                 page: ViewablePages.Animal,
                 date: curretDate,
-                animalSet: loadedAnimals));
+                animalList: loadedAnimals));
 
           case AddFecesEvent(
-              animalName: String animalName,
-              fecesBool: bool fecesBool
+              targetAnimal: Animal animalName,
             ):
-            loadedAnimals.lookup(animalName)!.feces =
-                !loadedAnimals.lookup(animalName)!.feces;
+            int animalNumber = loadedAnimals.indexOf(animalName);
+            // loadedAnimals[animalNumber].feces =
+            //     !loadedAnimals[animalNumber].feces;
+            if (loadedAnimals[animalNumber].feces == true) {
+              loadedAnimals[animalNumber].feces = false;
+            } else {
+              loadedAnimals[animalNumber].feces = true;
+            }
             emit(PageViewState(
                 page: ViewablePages.Feces,
                 date: currentDate,
-                animalSet: loadedAnimals));
+                animalList: loadedAnimals));
         }
       },
     );

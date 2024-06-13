@@ -10,7 +10,7 @@ import 'package:documentation_assistant/resources.dart';
 
 class BlocAnimalPage extends StatefulWidget {
   final DateTime selectedDate;
-  final Set<Animal> animals;
+  final List<Animal> animals;
 
   const BlocAnimalPage(
       {super.key, required this.selectedDate, required this.animals});
@@ -109,7 +109,7 @@ class _BlocAnimalPageState extends State<BlocAnimalPage> {
 //collectively saves all feeding data for all animals
   void saveData(
     DateTime receivedDate,
-    Set<Animal> animalList,
+    List<Animal> animalList,
   ) async {
     List<String> animalNames = [];
     for (Animal anim in animalList) {

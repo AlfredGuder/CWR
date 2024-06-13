@@ -23,7 +23,7 @@ class AddFeedEvent extends AnimalEvent {
 }
 
 class AddFecesEvent extends AnimalEvent {
-  final String animalName;
-  final bool fecesBool;
-  const AddFecesEvent({required this.animalName, required this.fecesBool});
+  final Animal targetAnimal;
+
+  const AddFecesEvent({required this.targetAnimal});
 }
