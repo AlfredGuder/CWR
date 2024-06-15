@@ -47,6 +47,7 @@ class Animal {
       amFeed: $amFeed
       midFeed: $midFeed
       pmFeed: $pmFeed
+      feces: $feces
     ''';
   }
 
