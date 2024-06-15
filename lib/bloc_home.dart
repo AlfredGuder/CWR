@@ -67,28 +67,28 @@ class _BlocHomeState extends State<BlocHome> {
                   LoadingTypes.FeedingData => 'Loading feeding data',
                   LoadingTypes.FenceValue => 'Loading fence values',
                 }),
-              PageViewState(page: ViewablePages.Animal) => BlocAnimalPage(
+              PageViewState() => (){
+                print("Viewing page ${state.page}:\n${state.loadedAnimals.toString()}");
+                switch (state.page) {
+                  
+                  case ViewablePages.Animal:
+                    return BlocAnimalPage(
                   selectedDate: state.currentDate,
-                  animals: state.loadedAnimals),
-              PageViewState(page: ViewablePages.Feces) => BlocFecesPage(
-                  selectedDate: state.currentDate,
-                  animals: state.loadedAnimals,
-                ),
-              //TODO fix this page
-              PageViewState(page: ViewablePages.Addition) => BlocFecesPage(
-                  selectedDate: state.currentDate,
-                  animals: state.loadedAnimals,
-                ),
-              //TODO fix this page
-              PageViewState(page: ViewablePages.Comment) => BlocFecesPage(
+                  animals: state.loadedAnimals);
+                  case ViewablePages.Feces:
+                    return BlocFecesPage(
                   selectedDate: state.currentDate,
                   animals: state.loadedAnimals,
-                ),
-              //TODO fix this page
-              PageViewState(page: ViewablePages.Fence) => BlocFecesPage(
+                );
+                  case ViewablePages.Comment:
+                  case ViewablePages.Fence:
+                  case ViewablePages.Addition:
+                    return BlocFecesPage(
                   selectedDate: state.currentDate,
                   animals: state.loadedAnimals,
-                )
+                );
+                }
+              }()
             },
           );
         },

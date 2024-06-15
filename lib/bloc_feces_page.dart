@@ -17,16 +17,13 @@ class BlocFecesPage extends StatefulWidget {
 }
 
 class _BlocFecesPageState extends State<BlocFecesPage> {
-  late List<Animal> animalList;
-  late Map<String, bool> fecesMap = {};
-  late List<String> nameList = [];
-  late List<String> fecesButtonText = [];
+  
+  
 
   @override
   void initState() {
     super.initState();
-    animalList = widget.animals;
-    setupPage();
+
   }
 
   @override
@@ -38,7 +35,7 @@ class _BlocFecesPageState extends State<BlocFecesPage> {
           height: 500,
           child: ListView.builder(
               shrinkWrap: true,
-              itemCount: nameList.length,
+              itemCount: widget.animals.length,
               itemBuilder: (BuildContext context, int index) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -49,22 +46,30 @@ class _BlocFecesPageState extends State<BlocFecesPage> {
                         SizedBox(
                           height: 40,
                           width: 100,
-                          child: Text(nameList[index]),
+                          child: Text(widget.animals[index].animalName),
                         ),
-                        FloatingActionButton(
-                          backgroundColor: (Colors.orange),
-                          foregroundColor: (Colors.black),
-                          heroTag: 'fecesCheckButton$index',
-                          onPressed: () {
-                            if (mounted) {
+                        Switch(activeColor: Colors.orange, value: widget.animals[index].feces, onChanged: (_flag) {
+                          
+                          if (mounted) {
                               AnimalBloc bloc = context.read<AnimalBloc>();
-                              bloc.add(AddFecesEvent(
-                                targetAnimal: animalList[index],
+                              bloc.add(ToggleFecesEvent(
+                                targetAnimal: widget.animals[index],
                               ));
-                            }
-                          },
-                          child: Text(fecesButtonText[index]),
-                        )
+                        }})
+                        // FloatingActionButton(
+                        //   backgroundColor: (Colors.orange),
+                        //   foregroundColor: (Colors.black),
+                        //   heroTag: 'fecesCheckButton$index',
+                        //   onPressed: () {
+                        //     if (mounted) {
+                        //       AnimalBloc bloc = context.read<AnimalBloc>();
+                        //       bloc.add(ToggleFecesEvent(
+                        //         targetAnimal: widget.animals[index],
+                        //       ));
+                        //     }
+                        //   },
+                        //   child: Text(widget.animals[index].feces? "Yes" : "No"),
+                        // )
                       ],
                       //   if (mounted) {
                       //   AnimalBloc bloc = context.read<AnimalBloc>();
@@ -84,25 +89,25 @@ class _BlocFecesPageState extends State<BlocFecesPage> {
           heroTag: 'saveButton',
           backgroundColor: (Colors.orange),
           foregroundColor: (Colors.black),
-          onPressed: () => () {}, //saveToSheet(useDate),
+          onPressed: () => context.read<AnimalBloc>().add(SaveFecesEvent()), //saveToSheet(useDate),
           child: const Text('save'),
         ),
       ],
     );
   }
 
-  void setupPage() {
-    for (Animal targetAnimal in animalList) {
-      fecesMap.putIfAbsent(targetAnimal.animalName, () => targetAnimal.feces);
+  // void setupPage() {
+  //   for (Animal targetAnimal in animalList) {
+  //     fecesMap.putIfAbsent(targetAnimal.animalName, () => targetAnimal.feces);
 
-      nameList.add(targetAnimal.animalName);
-    }
-    for (String name in nameList) {
-      if (fecesMap[name] == false) {
-        fecesButtonText.add('No');
-      } else {
-        fecesButtonText.add('Yes');
-      }
-    }
-  }
+  //     nameList.add(targetAnimal.animalName);
+  //   }
+  //   for (String name in nameList) {
+  //     if (fecesMap[name] == false) {
+  //       fecesButtonText.add('No');
+  //     } else {
+  //       fecesButtonText.add('Yes');
+  //     }
+  //   }
+  // }
 }

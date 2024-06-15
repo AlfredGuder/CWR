@@ -22,8 +22,11 @@ class AddFeedEvent extends AnimalEvent {
   const AddFeedEvent({required this.animalToAdd, required this.currentDate});
 }
 
-class AddFecesEvent extends AnimalEvent {
+class ToggleFecesEvent extends AnimalEvent {
   final Animal targetAnimal;
 
-  const AddFecesEvent({required this.targetAnimal});
+  const ToggleFecesEvent({required this.targetAnimal});
+}
+
+class SaveFecesEvent extends AnimalEvent {
 }

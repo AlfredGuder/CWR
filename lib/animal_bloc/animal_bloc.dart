@@ -42,7 +42,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
                 date: curretDate,
                 animalList: loadedAnimals));
 
-          case AddFecesEvent(
+          case ToggleFecesEvent(
               targetAnimal: Animal animalName,
             ):
             int animalNumber = loadedAnimals.indexOf(animalName);
@@ -57,6 +57,10 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
                 page: ViewablePages.Feces,
                 date: currentDate,
                 animalList: loadedAnimals));
+
+          case SaveFecesEvent() : 
+          
+          saveFecesData();
         }
       },
     );
@@ -126,12 +130,21 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
         .insertValue(animalToSave.pmFeed, column: 3, row: amFeedRow + 2);
   }
 
-//  loadedAnimals.lookup(targetToAdd)!
-//               ..amFeed = targetToAdd.amFeed
-//               ..midFeed = targetToAdd.midFeed
-//               ..pmFeed = targetToAdd.pmFeed;
+  Future<void> saveFecesData() async{
+    final Worksheet currentWorkSheet =
+        await SheetService.checkSheetforDate(currentDate, loadedAnimals);
 
-//fecesList
+    for(Animal thisAnimal in loadedAnimals) {
+
+    String currentAnimalName = thisAnimal.animalName;
+    int currentAnimalStartingRow = await currentWorkSheet.values
+        .rowIndexOf(currentAnimalName, inColumn: 6);
+    int amFeedRow = currentAnimalStartingRow + (3 * currentDate.day - 1);
+    await currentWorkSheet.values.insertValue(thisAnimal.feces ? "Yes" : "No", column: 4, row: amFeedRow);
+
+
+    }
+  }
 }
 
 
