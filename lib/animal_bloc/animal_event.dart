@@ -28,5 +28,15 @@ class ToggleFecesEvent extends AnimalEvent {
   const ToggleFecesEvent({required this.targetAnimal});
 }
 
-class SaveFecesEvent extends AnimalEvent {
+class SaveFecesEvent extends AnimalEvent {}
+
+class AddFenceValue extends AnimalEvent {
+  final String fenceToAdd;
+  final double newValue;
+  final DateTime currentDate;
+  const AddFenceValue({
+    required this.fenceToAdd,
+    required this.currentDate,
+    required this.newValue,
+  });
 }

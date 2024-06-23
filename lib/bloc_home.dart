@@ -3,6 +3,7 @@ import 'package:documentation_assistant/animal_bloc/animal_event.dart';
 import 'package:documentation_assistant/animal_bloc/animal_state.dart';
 import 'package:documentation_assistant/bloc_animal_page.dart';
 import 'package:documentation_assistant/bloc_feces_page.dart';
+import 'package:documentation_assistant/bloc_hot_wire.dart';
 import 'package:documentation_assistant/loading_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,28 +68,31 @@ class _BlocHomeState extends State<BlocHome> {
                   LoadingTypes.FeedingData => 'Loading feeding data',
                   LoadingTypes.FenceValue => 'Loading fence values',
                 }),
-              PageViewState() => (){
-                print("Viewing page ${state.page}:\n${state.loadedAnimals.toString()}");
-                switch (state.page) {
-                  
-                  case ViewablePages.Animal:
-                    return BlocAnimalPage(
-                  selectedDate: state.currentDate,
-                  animals: state.loadedAnimals);
-                  case ViewablePages.Feces:
-                    return BlocFecesPage(
-                  selectedDate: state.currentDate,
-                  animals: state.loadedAnimals,
-                );
-                  case ViewablePages.Comment:
-                  case ViewablePages.Fence:
-                  case ViewablePages.Addition:
-                    return BlocFecesPage(
-                  selectedDate: state.currentDate,
-                  animals: state.loadedAnimals,
-                );
-                }
-              }()
+              PageViewState() => () {
+                  print(
+                      "Viewing page ${state.page}:\n${state.loadedAnimals.toString()}");
+                  switch (state.page) {
+                    case ViewablePages.Animal:
+                      return BlocAnimalPage(
+                          selectedDate: state.currentDate,
+                          animals: state.loadedAnimals);
+                    case ViewablePages.Feces:
+                      return BlocFecesPage(
+                        selectedDate: state.currentDate,
+                        animals: state.loadedAnimals,
+                      );
+                    case ViewablePages.Fence:
+                      return BlocHotWire(
+                          currentDate: state.currentDate,
+                          fenceValues: state.fenceValues);
+                    case ViewablePages.Comment:
+                    case ViewablePages.Addition:
+                      return BlocFecesPage(
+                        selectedDate: state.currentDate,
+                        animals: state.loadedAnimals,
+                      );
+                  }
+                }()
             },
           );
         },

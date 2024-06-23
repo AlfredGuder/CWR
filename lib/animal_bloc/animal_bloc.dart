@@ -11,6 +11,17 @@ import 'package:gsheets/gsheets.dart';
 
 class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
   List<Animal> loadedAnimals = [];
+  List<String> fenceList = [
+    'LemurFalls',
+    'CPF1',
+    'CPF2',
+    'CPF3',
+    'CPF4',
+    'CPF5',
+    'CPF6',
+    'CPF7',
+  ];
+  Map<String, double> fenceMap = {};
 
   DateTime currentDate = DateTime.now();
   AnimalBloc() : super(AppInitialState()) {
@@ -24,6 +35,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
             emit(LoadingState(loadingTypes: event.loadingTypes));
           case ViewPage():
             emit(PageViewState(
+                fenceValuesMap: fenceMap,
                 animalList: loadedAnimals,
                 date: currentDate,
                 page: event.page));
@@ -38,6 +50,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
               ..midFeed = targetToAdd.midFeed
               ..pmFeed = targetToAdd.pmFeed;
             emit(PageViewState(
+                fenceValuesMap: fenceMap,
                 page: ViewablePages.Animal,
                 date: curretDate,
                 animalList: loadedAnimals));
@@ -54,13 +67,25 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
               loadedAnimals[animalNumber].feces = true;
             }
             emit(PageViewState(
+                fenceValuesMap: fenceMap,
                 page: ViewablePages.Feces,
                 date: currentDate,
                 animalList: loadedAnimals));
 
-          case SaveFecesEvent() : 
-          
-          saveFecesData();
+          case SaveFecesEvent():
+            saveFecesData();
+
+          case AddFenceValue(
+              fenceToAdd: String campName,
+              newValue: double userValue,
+            ):
+            fenceMap[campName] = userValue;
+            saveFenceData();
+            emit(PageViewState(
+                fenceValuesMap: fenceMap,
+                page: ViewablePages.Fence,
+                date: currentDate,
+                animalList: loadedAnimals));
         }
       },
     );
@@ -74,6 +99,9 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     add(const LoadingStarted(loadingTypes: LoadingTypes.FeedingData));
     await loadFeedingDataForDate(currentDate, animalList);
     loadedAnimals.addAll(animalList);
+
+    add(const LoadingStarted(loadingTypes: LoadingTypes.FenceValue));
+    fenceMap = await getFenceValues()!;
     add(const ViewPage(page: ViewablePages.Animal));
   }
 
@@ -109,6 +137,33 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     }
   }
 
+  Future<Map<String, double>>? getFenceValues() async {
+    Map<String, double> fenceValueMap = {};
+    Worksheet currentWorksheet =
+        await SheetService.checkHotWireSheet(currentDate);
+
+    fenceList.map((campName) {
+      fenceValueMap.putIfAbsent(campName, () => 0);
+    });
+
+    int checkColumn = currentDate.month + 1;
+    List<String> allValues = await currentWorksheet.values.column(checkColumn);
+    for (String currentCamp in fenceList) {
+      int startRow =
+          await currentWorksheet.values.rowIndexOf(currentCamp, inColumn: 1);
+
+      int checkRow = startRow + currentDate.day;
+
+      double campValue = double.parse(allValues[checkRow - 1]);
+
+      // double campValue = double.parse(await currentWorksheet.values
+      //     .value(column: checkColumn, row: checkRow));
+      fenceValueMap[currentCamp] = campValue;
+    }
+
+    return fenceValueMap;
+  }
+
 //TODO parse lsit of new animals, and list of old animals, calculate which ones chanced, only update them
   Future<void> saveThisData(
     DateTime receivedDate,
@@ -130,19 +185,30 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
         .insertValue(animalToSave.pmFeed, column: 3, row: amFeedRow + 2);
   }
 
-  Future<void> saveFecesData() async{
+  Future<void> saveFecesData() async {
     final Worksheet currentWorkSheet =
         await SheetService.checkSheetforDate(currentDate, loadedAnimals);
 
-    for(Animal thisAnimal in loadedAnimals) {
+    for (Animal thisAnimal in loadedAnimals) {
+      String currentAnimalName = thisAnimal.animalName;
+      int currentAnimalStartingRow = await currentWorkSheet.values
+          .rowIndexOf(currentAnimalName, inColumn: 6);
+      int amFeedRow = currentAnimalStartingRow + (3 * currentDate.day - 1);
+      await currentWorkSheet.values.insertValue(thisAnimal.feces ? "Yes" : "No",
+          column: 4, row: amFeedRow);
+    }
+  }
 
-    String currentAnimalName = thisAnimal.animalName;
-    int currentAnimalStartingRow = await currentWorkSheet.values
-        .rowIndexOf(currentAnimalName, inColumn: 6);
-    int amFeedRow = currentAnimalStartingRow + (3 * currentDate.day - 1);
-    await currentWorkSheet.values.insertValue(thisAnimal.feces ? "Yes" : "No", column: 4, row: amFeedRow);
-
-
+  Future<void> saveFenceData() async {
+    final Worksheet currentWorkSheet =
+        await SheetService.checkSheetforDate(currentDate, loadedAnimals);
+    for (String currentCamp in fenceList) {
+      int currentCampRow =
+          await currentWorkSheet.values.rowIndexOf(currentCamp);
+      int currentMonthRow = currentDate.month + 1;
+      int currentDayRow = currentDate.day + currentCampRow;
+      await currentWorkSheet.values.insertValue(fenceMap[currentCamp]!,
+          column: currentMonthRow, row: currentDayRow);
     }
   }
 }

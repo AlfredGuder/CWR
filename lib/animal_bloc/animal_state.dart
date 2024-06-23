@@ -11,7 +11,11 @@ class AppInitialState extends AnimalState {
 sealed class DataDisplayState extends AnimalState {
   final List<Animal> loadedAnimals;
   final DateTime currentDate;
-  DataDisplayState({required this.loadedAnimals, required this.currentDate});
+  final Map<String, double> fenceValues;
+  DataDisplayState(
+      {required this.loadedAnimals,
+      required this.currentDate,
+      required this.fenceValues});
 }
 
 class LoadingState extends AnimalState {
@@ -26,8 +30,12 @@ class PageViewState extends DataDisplayState {
   PageViewState(
       {required this.page,
       required DateTime date,
-      required List<Animal> animalList})
-      : super(currentDate: date, loadedAnimals: animalList);
+      required List<Animal> animalList,
+      required Map<String, double> fenceValuesMap})
+      : super(
+            currentDate: date,
+            loadedAnimals: animalList,
+            fenceValues: fenceValuesMap);
 }
 
 enum ViewablePages {
