@@ -22,6 +22,8 @@ Future<void> sheetBuildHotwire(List<String> campList, String title) async {
     'March',
     'April',
     'May',
+    'June',
+    'July',
     'Augast',
     'September',
     'October',

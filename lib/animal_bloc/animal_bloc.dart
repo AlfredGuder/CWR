@@ -80,7 +80,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
               newValue: double userValue,
             ):
             fenceMap[campName] = userValue;
-            saveFenceData();
+            saveFenceData(campName);
             emit(PageViewState(
                 fenceValuesMap: fenceMap,
                 page: ViewablePages.Fence,
@@ -139,6 +139,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
 
   Future<Map<String, double>>? getFenceValues() async {
     Map<String, double> fenceValueMap = {};
+
     Worksheet currentWorksheet =
         await SheetService.checkHotWireSheet(currentDate);
 
@@ -199,15 +200,15 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     }
   }
 
-  Future<void> saveFenceData() async {
-    final Worksheet currentWorkSheet =
-        await SheetService.checkSheetforDate(currentDate, loadedAnimals);
+  Future<void> saveFenceData(String campname) async {
+    final Worksheet currentWorksheet =
+        await SheetService.checkHotWireSheet(currentDate);
     for (String currentCamp in fenceList) {
       int currentCampRow =
-          await currentWorkSheet.values.rowIndexOf(currentCamp);
+          await currentWorksheet.values.rowIndexOf(currentCamp);
       int currentMonthRow = currentDate.month + 1;
       int currentDayRow = currentDate.day + currentCampRow;
-      await currentWorkSheet.values.insertValue(fenceMap[currentCamp]!,
+      await currentWorksheet.values.insertValue(fenceMap[currentCamp]!,
           column: currentMonthRow, row: currentDayRow);
     }
   }

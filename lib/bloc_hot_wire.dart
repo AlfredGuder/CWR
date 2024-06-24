@@ -102,7 +102,9 @@ class _BlocHotWireState extends State<BlocHotWire> {
               foregroundColor: Colors.black,
               heroTag: 'SubmitButton',
               onPressed: () {
-                submitFence;
+                Navigator.of(context).pop(
+                  double.parse(controller.text),
+                );
               },
               child: const Text('Update'),
             )
