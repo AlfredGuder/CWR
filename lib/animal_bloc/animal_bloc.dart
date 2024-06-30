@@ -21,6 +21,8 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     'CPF6',
     'CPF7',
   ];
+
+  Map<String, List<String>> commentMap = {};
   Map<String, double> fenceMap = {};
 
   DateTime currentDate = DateTime.now();
@@ -103,6 +105,9 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     add(const LoadingStarted(loadingTypes: LoadingTypes.FenceValue));
     fenceMap = await getFenceValues()!;
     add(const ViewPage(page: ViewablePages.Animal));
+
+    add(const LoadingStarted(loadingTypes: LoadingTypes.FenceValue));
+    await getCommentMap();
   }
 
   Future<void> loadFeedingDataForDate(
@@ -163,6 +168,32 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
     }
 
     return fenceValueMap;
+  }
+
+  Future<void> getCommentMap() async {
+    for (Animal currentAnimal in loadedAnimals) {
+      commentMap.putIfAbsent(currentAnimal.animalName, () => []);
+    }
+    Worksheet currentWorksheet =
+        await SheetService.getWorkSheetByDate(currentDate);
+    List<String> animalNameValues = await currentWorksheet.values.column(6);
+    List<String> commentRowValues = await currentWorksheet.values.column(7);
+
+    for (Animal currentAnimal in loadedAnimals) {
+      int animalNameRow = animalNameValues.indexOf(currentAnimal.animalName);
+      int commentRow = animalNameRow + (3 * currentDate.day - 1);
+      String currentAnimalCommentData = commentRowValues[commentRow];
+
+      if (currentAnimalCommentData == 'No comments for today') {
+        commentMap[currentAnimal.animalName]!.add(currentAnimalCommentData);
+      } else {
+        List<String> spltCommentStringList =
+            currentAnimalCommentData.split('//');
+        for (int j = 0; j < spltCommentStringList.length; j++) {
+          commentMap[currentAnimal]!.add(spltCommentStringList[j]);
+        }
+      }
+    }
   }
 
 //TODO parse lsit of new animals, and list of old animals, calculate which ones chanced, only update them
