@@ -54,10 +54,15 @@ class _BlocAnimalPageState extends State<BlocAnimalPage> {
                     context: context,
                     initialDate: widget.selectedDate,
                     firstDate: DateTime(2023),
-                    lastDate: DateTime(2024, 12),
+                    lastDate: DateTime(2050, 12),
                   );
 
                   if (newDate == null) return;
+
+                  if (mounted) {
+                    AnimalBloc bloc = context.read<AnimalBloc>();
+                    bloc.add(ChangeDateEvent(newDate: newDate));
+                  }
                 },
               ),
             ],

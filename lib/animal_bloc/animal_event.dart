@@ -40,3 +40,15 @@ class AddFenceValue extends AnimalEvent {
     required this.newValue,
   });
 }
+
+class SaveAnimalComment extends AnimalEvent {
+  final String targetAnimal;
+
+  const SaveAnimalComment({required this.targetAnimal});
+}
+
+class ChangeDateEvent extends AnimalEvent {
+  final DateTime newDate;
+
+  const ChangeDateEvent({required this.newDate});
+}

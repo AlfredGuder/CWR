@@ -105,6 +105,7 @@ class _BlocHotWireState extends State<BlocHotWire> {
                 Navigator.of(context).pop(
                   double.parse(controller.text),
                 );
+                controller.clear();
               },
               child: const Text('Update'),
             )

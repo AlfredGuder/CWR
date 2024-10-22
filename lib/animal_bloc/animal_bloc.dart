@@ -37,6 +37,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
             emit(LoadingState(loadingTypes: event.loadingTypes));
           case ViewPage():
             emit(PageViewState(
+                commentMap: commentMap,
                 fenceValuesMap: fenceMap,
                 animalList: loadedAnimals,
                 date: currentDate,
@@ -52,6 +53,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
               ..midFeed = targetToAdd.midFeed
               ..pmFeed = targetToAdd.pmFeed;
             emit(PageViewState(
+                commentMap: commentMap,
                 fenceValuesMap: fenceMap,
                 page: ViewablePages.Animal,
                 date: curretDate,
@@ -69,6 +71,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
               loadedAnimals[animalNumber].feces = true;
             }
             emit(PageViewState(
+                commentMap: commentMap,
                 fenceValuesMap: fenceMap,
                 page: ViewablePages.Feces,
                 date: currentDate,
@@ -84,10 +87,37 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
             fenceMap[campName] = userValue;
             saveFenceData(campName);
             emit(PageViewState(
+                commentMap: commentMap,
                 fenceValuesMap: fenceMap,
                 page: ViewablePages.Fence,
                 date: currentDate,
                 animalList: loadedAnimals));
+
+          case SaveAnimalComment(targetAnimal: String targetAnimal):
+            String uploadString = '';
+            String searchDate = currentDate.day.toString();
+            Worksheet currentWorkSheet =
+                await SheetService.getWorkSheetByDate(currentDate);
+            int currentAnimalStartingRow = await currentWorkSheet.values
+                .rowIndexOf(targetAnimal, inColumn: 6);
+            int commentRow =
+                currentAnimalStartingRow + (3 * int.parse(searchDate) - 1);
+
+            if (commentMap[targetAnimal]!.length == 1) {
+              uploadString = commentMap[targetAnimal]![0];
+            } else {
+              for (int i = 0; i < commentMap[targetAnimal]!.length; i++) {
+                uploadString = '$uploadString//${commentMap[targetAnimal]![i]}';
+              }
+            }
+            currentWorkSheet.values
+                .insertValue(uploadString, column: 7, row: commentRow);
+
+            uploadString = '';
+          case ChangeDateEvent(newDate: DateTime newDate):
+            currentDate = newDate;
+            loadedAnimals = [];
+            fetchAnimalList();
         }
       },
     );
@@ -96,6 +126,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
 
   Future<void> fetchAnimalList() async {
     // await Future.delayed(Duration.zero);
+
     add(const LoadingStarted(loadingTypes: LoadingTypes.Animal));
     List<Animal> animalList = await SheetService.animalFeedListBuilder();
     add(const LoadingStarted(loadingTypes: LoadingTypes.FeedingData));
@@ -104,10 +135,11 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
 
     add(const LoadingStarted(loadingTypes: LoadingTypes.FenceValue));
     fenceMap = await getFenceValues()!;
-    add(const ViewPage(page: ViewablePages.Animal));
 
-    add(const LoadingStarted(loadingTypes: LoadingTypes.FenceValue));
+    add(const LoadingStarted(loadingTypes: LoadingTypes.CommentData));
     await getCommentMap();
+
+    add(const ViewPage(page: ViewablePages.Animal));
   }
 
   Future<void> loadFeedingDataForDate(
@@ -186,6 +218,8 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
 
       if (currentAnimalCommentData == 'No comments for today') {
         commentMap[currentAnimal.animalName]!.add(currentAnimalCommentData);
+      } else if (currentAnimalCommentData.contains('//') == false) {
+        commentMap[currentAnimal.animalName]!.add(currentAnimalCommentData);
       } else {
         List<String> spltCommentStringList =
             currentAnimalCommentData.split('//');
@@ -193,6 +227,7 @@ class AnimalBloc extends Bloc<AnimalEvent, AnimalState> {
           commentMap[currentAnimal]!.add(spltCommentStringList[j]);
         }
       }
+      print('Loaded comments for ${currentAnimal.animalName}');
     }
   }
 

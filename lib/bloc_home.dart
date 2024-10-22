@@ -1,7 +1,9 @@
 import 'package:documentation_assistant/animal_bloc/animal_bloc.dart';
 import 'package:documentation_assistant/animal_bloc/animal_event.dart';
 import 'package:documentation_assistant/animal_bloc/animal_state.dart';
+import 'package:documentation_assistant/bloc_animal_addition_page.dart';
 import 'package:documentation_assistant/bloc_animal_page.dart';
+import 'package:documentation_assistant/bloc_comment_page.dart';
 import 'package:documentation_assistant/bloc_feces_page.dart';
 import 'package:documentation_assistant/bloc_hot_wire.dart';
 import 'package:documentation_assistant/loading_text.dart';
@@ -67,6 +69,7 @@ class _BlocHomeState extends State<BlocHome> {
                   LoadingTypes.Animal => 'Loading animal data',
                   LoadingTypes.FeedingData => 'Loading feeding data',
                   LoadingTypes.FenceValue => 'Loading fence values',
+                  LoadingTypes.CommentData => 'Loading animal comments'
                 }),
               PageViewState() => () {
                   print(
@@ -86,8 +89,12 @@ class _BlocHomeState extends State<BlocHome> {
                           currentDate: state.currentDate,
                           fenceValues: state.fenceValues);
                     case ViewablePages.Comment:
+                      return BlocCommentpage(
+                          currentDate: state.currentDate,
+                          commentMap: state.commentMap,
+                          animalList: state.loadedAnimals);
                     case ViewablePages.Addition:
-                      return BlocFecesPage(
+                      return BlocAnimalAddition(
                         selectedDate: state.currentDate,
                         animals: state.loadedAnimals,
                       );

@@ -12,9 +12,11 @@ sealed class DataDisplayState extends AnimalState {
   final List<Animal> loadedAnimals;
   final DateTime currentDate;
   final Map<String, double> fenceValues;
+  final Map<String, List<String>> commentMap;
   DataDisplayState(
       {required this.loadedAnimals,
       required this.currentDate,
+      required this.commentMap,
       required this.fenceValues});
 }
 
@@ -31,8 +33,10 @@ class PageViewState extends DataDisplayState {
       {required this.page,
       required DateTime date,
       required List<Animal> animalList,
+      required Map<String, List<String>> commentMap,
       required Map<String, double> fenceValuesMap})
       : super(
+            commentMap: commentMap,
             currentDate: date,
             loadedAnimals: animalList,
             fenceValues: fenceValuesMap);

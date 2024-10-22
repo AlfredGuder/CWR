@@ -42,12 +42,14 @@ class _LoadingIconState extends State<LoadingIcon> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 150,
-      height: 75,
-      child: Image(
-        image: AssetImage(displayFrame),
-        fit: BoxFit.cover,
+    return Center(
+      child: SizedBox(
+        width: 150,
+        height: 75,
+        child: Image(
+          image: AssetImage(displayFrame),
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
